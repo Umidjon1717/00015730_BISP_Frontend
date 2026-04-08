@@ -1,0 +1,8 @@
+.animete-hide{
+    animation: animeteHide 0.25s ease 1s forwards;
+}
+@keyframes animeteHide {
+    to{
+        transform: translateY(-24px);
+    }
+}

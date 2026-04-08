@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  @font-face {
+    font-family: "Poppins Bold";
+    font-display: swap;
+    src: url(/src/assets/fonts/Poppins-Bold.woff2) format("woff2");
+  }
+  @font-face {
+    font-family: "Poppins";
+    src: url(/src/assets/fonts/Poppins-Medium.woff2);
+  }
+  @font-face {
+    font-family: "Montserrat";
+    src: url(/src/assets/fonts/Montserrat-Medium.ttf);
+  }
+  @font-face {
+    font-family: "Poppins Light";
+    font-display: swap;
+    src: url(/src/assets/fonts/Poppins-Light.woff2) format("woff2");
+  }
+}
+// html {
+//   scroll-behavior: smooth;
+// }
+
+body.light {
+  background-color: #ffffff;
+  color: #18181b;
+  transition: background-color 300ms, color 300ms;
+}
+
+body.dark {
+  background-color: #18181b;
+  color: #ffffff;
+  transition: background-color 300ms, color 300ms;
+}
