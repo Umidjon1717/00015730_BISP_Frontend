@@ -10,13 +10,12 @@ import { IoTrashOutline } from "react-icons/io5";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import empty_cart from "@/assets/images/image.png";
-import { getImageBaseUrl } from "@/config/env";
+import { resolveImageUrl } from "@/config/env";
 const Cart = () => {
   const cart = useSelector((state: RootState) => state.cart.value);
   const token = useSelector((state: RootState) => state.token.access_token);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const imageBaseUrl = getImageBaseUrl();
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -85,9 +84,7 @@ const Cart = () => {
                   >
                     <td className="px-3 py-4 flex items-center gap-3">
                       <img
-                        src={
-                          imageBaseUrl + product.images[0]
-                        }
+                        src={resolveImageUrl(product.images?.[0])}
                         alt={product.name}
                         className="w-12 h-12 object-cover rounded-lg"
                       />
@@ -168,9 +165,7 @@ const Cart = () => {
                 >
                   <div className="flex gap-6 items-center">
                     <img
-                      src={
-                        imageBaseUrl + product.images[0]
-                      }
+                      src={resolveImageUrl(product.images?.[0])}
                       alt={product.name}
                       className="w-28 h-28 object-cover rounded-lg shadow-sm"
                     />

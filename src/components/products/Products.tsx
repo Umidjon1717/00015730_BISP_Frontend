@@ -4,7 +4,7 @@ import { IProduct } from "../../types";
 import Heart from "./Heart";
 import Discount from "./Discount";
 import CartButton from "./CartButton";
-import { getImageBaseUrl } from "@/config/env";
+import { resolveImageUrl } from "@/config/env";
 
 interface IProductProps {
   data: IProduct[];
@@ -15,7 +15,6 @@ const Products: FC<IProductProps> = ({ data, title, grid }) => {
   const { pathname } = useLocation();
 
   const navigate = useNavigate();
-  const imageBaseUrl = getImageBaseUrl();
   const productItems = data?.map((product: IProduct) => (
     <div
       key={product.id}
@@ -31,7 +30,7 @@ const Products: FC<IProductProps> = ({ data, title, grid }) => {
       >
         <img
           className="w-full h-full object-cover group-hover:scale-[1.02] transition-all duration-300"
-          src={`${imageBaseUrl}${product.images[0]}`}
+          src={resolveImageUrl(product.images?.[0])}
           alt={product.name}
         />
       </div>

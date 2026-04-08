@@ -8,7 +8,7 @@ import { IProduct, IReview } from "@/types";
 import { useDispatch, useSelector } from "react-redux";
 import { addCart } from "../../redux/features/cart-slice";
 import { RootState } from "../../redux";
-import { getImageBaseUrl } from "@/config/env";
+import { resolveImageUrl } from "@/config/env";
 
 const ProductDetail = ({
   product,
@@ -19,7 +19,6 @@ const ProductDetail = ({
   category: any;
   id: number;
 }) => {
-  const imageBaseUrl = getImageBaseUrl();
   const [selectedImage, setSelectedImage] = useState(0);
   const cart = useSelector((state: RootState) => state.cart.value);
   const [activeTab, setActiveTab] = useState("description");
@@ -91,7 +90,7 @@ const ProductDetail = ({
               {product?.images.map((img, index) => (
                 <img
                   key={index}
-                  src={`${imageBaseUrl}${img}`}
+                  src={resolveImageUrl(img)}
                   alt={`Thumbnail ${index + 1}`}
                   className="
                   w-full max-w-[160px] h-auto aspect-video object-cover 
@@ -108,12 +107,12 @@ const ProductDetail = ({
             <div>
               <div className="w-full max-w-lg h-80 overflow-hidden">
                 <img
-                  src={`${imageBaseUrl}${product.images[selectedImage]}`}
+                  src={resolveImageUrl(product.images?.[selectedImage])}
                   alt={product.name}
                   className="w-full h-full object-cover rounded-lg"
                   onClick={() => {
                     setModalImage(
-                      `${imageBaseUrl}${product.images[selectedImage]}`
+                      resolveImageUrl(product.images?.[selectedImage])
                     );
                     setIsModalOpen(true);
                   }}
@@ -340,13 +339,13 @@ const ProductDetail = ({
           {product.images.slice(0, 2).map((img, index) => (
             <img
               key={index}
-              src={`${imageBaseUrl}${img}`}
+              src={resolveImageUrl(img)}
               alt={`Product Image ${index + 1}`}
               className="
               w-full h-auto object-cover rounded-lg cursor-pointer
               sm:max-h-48 md:max-h-64 lg:max-h-80 xl:max-h-96 aspect-video"
               onClick={() => {
-                setModalImage(`${imageBaseUrl}${img}`);
+                setModalImage(resolveImageUrl(img));
                 setIsModalOpen(true);
               }}
             />

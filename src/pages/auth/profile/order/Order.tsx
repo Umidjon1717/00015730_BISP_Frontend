@@ -4,10 +4,9 @@ import {
   useDeleteOrderMutation,
   useGetOrderByCustomerIdQuery,
 } from "@/redux/api/order-api";
-import { getImageBaseUrl } from "@/config/env";
+import { resolveImageUrl } from "@/config/env";
 
 const Order = () => {
-  const imageBaseUrl = getImageBaseUrl();
   const { data } = useCheckTokenQuery(null);
   const [deletingOrderId, setDeletingOrderId] = React.useState<number | null>(
     null
@@ -98,9 +97,7 @@ const Order = () => {
                 className="border p-4 max-sm:p-2 rounded-lg flex flex-col sm:flex-row items-center gap-6 max-sm:gap-2 bg-gray-100 dark:bg-zinc-900 dark:border-gray-700 shadow-sm hover:shadow-lg transition-shadow"
               >
                 <img
-                  src={
-                    imageBaseUrl + detail.product.images[0]
-                  }
+                  src={resolveImageUrl(detail?.product?.images?.[0])}
                   alt={detail.product.name}
                   className="w-24 h-24 sm:w-32 sm:h-32 object-cover rounded-lg shadow-md"
                 />

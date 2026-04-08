@@ -6,14 +6,13 @@ import { useGetProductsQuery } from "@/redux/api/product-api";
 import { IProduct } from "@/types";
 import useDebounce from "@/hooks/useDebounce";
 import Switcher from "./Switcher";
-import { getImageBaseUrl } from "@/config/env";
+import { resolveImageUrl } from "@/config/env";
 
 const HeaderSearch: FC<{ searchOpen: boolean; setSearchOpen: any }> = ({
   setSearchOpen,
   searchOpen,
 }) => {
   const navigate = useNavigate();
-  const imageBaseUrl = getImageBaseUrl();
 
   const [value, setValue] = useState<string>("");
   const handleClear = () => {
@@ -78,7 +77,7 @@ const HeaderSearch: FC<{ searchOpen: boolean; setSearchOpen: any }> = ({
                 to={`/product/${product.id}`}
               >
                 <img
-                  src={imageBaseUrl + product.images[0]}
+                  src={resolveImageUrl(product.images?.[0])}
                   alt={product.name}
                   className="w-12 h-12 object-contain"
                 />
