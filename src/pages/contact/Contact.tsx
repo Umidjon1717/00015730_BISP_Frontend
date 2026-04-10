@@ -5,7 +5,7 @@ import { BsClockFill } from "react-icons/bs";
 import toast from "react-hot-toast";
 
 const BOT_TOKEN = "7870707568:AAHnwCxMt8d-pAApzK4MGwIjxBsvo3JkOdM";
-const CHAT_ID = "-1002278787927";
+const CHAT_ID = "-1003541128468";
 
 const Contact = () => {
   const nameRef = useRef<HTMLInputElement>(null);
