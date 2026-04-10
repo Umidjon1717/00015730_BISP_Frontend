@@ -25,8 +25,8 @@ export function getApiBaseUrl(): string {
     return normalizeTrailingSlash(configured);
   }
 
-  // Local dev fallback only
-  return normalizeTrailingSlash(configured || "http://localhost:3333/api");
+  // Local dev fallback only (kept in sync with .env.example)
+  return normalizeTrailingSlash(configured || "http://localhost:3000/api");
 }
 
 export function getImageBaseUrl(): string {
@@ -39,8 +39,8 @@ export function getImageBaseUrl(): string {
     return normalizeTrailingSlash(configured);
   }
 
-  // Local dev fallback only
-  return normalizeTrailingSlash(configured || "http://localhost:3333");
+  // Local dev fallback only (kept in sync with .env.example)
+  return normalizeTrailingSlash(configured || "http://localhost:3000");
 }
 
 export function resolveImageUrl(image: unknown): string {

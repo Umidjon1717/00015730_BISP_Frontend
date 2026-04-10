@@ -16,7 +16,7 @@ const Shop = () => {
   const sortBy = getParam("sort") || "newest";
   const limit = Number(getParam("limit")) || 12;
 
-  const { data, isLoading } = useGetProductsQuery({
+  const { data, isLoading, isError } = useGetProductsQuery({
     limit,
     page,
     ...(sortBy === "cheapest" || sortBy === "expensive"
@@ -70,7 +70,7 @@ const Shop = () => {
   return (
     <>
       <Hero title="Shop" path="/shop" />
-      {data && (
+      {data?.data?.products?.length ? (
         <Filter
           sortBy={sortBy}
           data={data}
@@ -79,17 +79,23 @@ const Shop = () => {
           setLimit={setLimit}
           setSortBy={setSortBy}
         />
-      )}
+      ) : null}
       <section>
         {isLoading ? (
           <Skeleton grid={grid} count={limit} />
-        ) : data ? (
+        ) : data?.data?.products?.length ? (
           <Products grid={grid} data={data?.data?.products} />
+        ) : isError ? (
+          <div className="container my-10 text-center text-red-500">
+            Failed to load products. Check API URL and backend status.
+          </div>
         ) : (
-          <></>
+          <div className="container my-10 text-center text-gray-500">
+            No products found yet.
+          </div>
         )}
 
-        {!isLoading && (
+        {!isLoading && data && data?.data?.totalPages > 1 && (
           <div className="flex justify-center">
             <Pagination
               count={data?.data?.totalPages}

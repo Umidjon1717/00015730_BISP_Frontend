@@ -30,5 +30,8 @@ export const mainApi = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQueryWithRetry,
   tagTypes: ["Product", "Customer", "Category", "Wishlist", "Order", "Address"],
+  refetchOnMountOrArgChange: true,
+  refetchOnFocus: true,
+  refetchOnReconnect: true,
   endpoints: () => ({}),
 });
