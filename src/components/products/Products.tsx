@@ -5,6 +5,10 @@ import Heart from "./Heart";
 import Discount from "./Discount";
 import CartButton from "./CartButton";
 import { resolveImageUrl } from "@/config/env";
+import { useDispatch, useSelector } from "react-redux";
+import { toggleCompare } from "@/redux/features/compare-slice";
+import { RootState } from "@/redux";
+import toast from "react-hot-toast";
 
 interface IProductProps {
   data: IProduct[];
@@ -13,8 +17,26 @@ interface IProductProps {
 }
 const Products: FC<IProductProps> = ({ data, title, grid }) => {
   const { pathname } = useLocation();
-
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const compareItems = useSelector((state: RootState) => state.compare.value);
+
+  const handleCompareToggle = (product: IProduct) => {
+    const exists = compareItems.some((item) => item.id === product.id);
+    dispatch(toggleCompare(product));
+
+    toast.success(
+      exists ? "Product removed from compare list" : "Product added to compare list",
+      {
+        position: "top-right",
+      }
+    );
+
+    if (!exists && compareItems.length >= 1) {
+      navigate("/compare");
+    }
+  };
+
   const productItems = data?.map((product: IProduct) => (
     <div
       key={product.id}
@@ -64,6 +86,14 @@ const Products: FC<IProductProps> = ({ data, title, grid }) => {
             USD
           </s>
         )}
+        <button
+          onClick={() => handleCompareToggle(product)}
+          className="mt-4 inline-flex h-10 items-center justify-center rounded-lg border border-gray-300 px-4 text-sm font-semibold text-gray-700 transition hover:border-gray-900 hover:text-gray-900 dark:border-zinc-700 dark:text-gray-200 dark:hover:border-white dark:hover:text-white"
+        >
+          {compareItems.some((item) => item.id === product.id)
+            ? "Remove Compare"
+            : "Compare"}
+        </button>
       </div>
     </div>
   ));

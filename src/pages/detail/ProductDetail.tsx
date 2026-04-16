@@ -9,6 +9,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { addCart } from "../../redux/features/cart-slice";
 import { RootState } from "../../redux";
 import { resolveImageUrl } from "@/config/env";
+import { toggleCompare } from "@/redux/features/compare-slice";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const ProductDetail = ({
   product,
@@ -25,6 +28,9 @@ const ProductDetail = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalImage, setModalImage] = useState("");
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const compareItems = useSelector((state: RootState) => state.compare.value);
+  const isCompared = compareItems.some((item) => item.id === product.id);
   const Modal = ({
     imageUrl,
     onClose,
@@ -79,6 +85,22 @@ const ProductDetail = ({
         ))}
       </div>
     );
+  };
+
+  const handleCompare = () => {
+    if (isCompared) {
+      navigate("/compare");
+      return;
+    }
+
+    dispatch(toggleCompare(product));
+    toast.success("Product added to compare list", {
+      position: "top-right",
+    });
+
+    if (compareItems.length >= 1) {
+      navigate("/compare");
+    }
   };
 
   return (
@@ -176,8 +198,11 @@ const ProductDetail = ({
                   : "Add to cart"}
               </button>
 
-              <button className="py-1 px-4 border border-black dark:border-gray-200 text-sm text-black dark:text-gray-200 rounded-lg dark:hover:text-black hover:text-white hover:bg-bg-primary dark:hover:border-bg-primary hover:border-bg-primary duration-300">
-                + Compare
+              <button
+                onClick={handleCompare}
+                className="py-1 px-4 border border-black dark:border-gray-200 text-sm text-black dark:text-gray-200 rounded-lg dark:hover:text-black hover:text-white hover:bg-bg-primary dark:hover:border-bg-primary hover:border-bg-primary duration-300"
+              >
+                {isCompared ? "Go to Compare" : "+ Compare"}
               </button>
             </div>
 

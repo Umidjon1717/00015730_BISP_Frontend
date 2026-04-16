@@ -9,7 +9,7 @@ import {
 } from "react-icons/ai";
 import { FiSearch, FiShoppingBag } from "react-icons/fi";
 import { MdMenu } from "react-icons/md";
-import { LuUser } from "react-icons/lu";
+import { LuGitCompareArrows, LuUser } from "react-icons/lu";
 import useOnlineonline from "@/hooks/useOnlineStatus";
 import "./Header.scss";
 import HeaderSearch from "./HeaderSearch";
@@ -31,6 +31,7 @@ const Header: FC = () => {
 
   const wishlist = useSelector((state: RootState) => state.wishlist.value);
   const cart = useSelector((state: RootState) => state.cart.value);
+  const compare = useSelector((state: RootState) => state.compare.value);
 
   const { data: wishlistData } = useGetWishlistQuery(
     Number(data?.customer?.id),
@@ -44,6 +45,7 @@ const Header: FC = () => {
     : 0;
 
   const cartTotal = cart?.length || 0;
+  const compareTotal = compare?.length || 0;
 
   const handleClear = () => {
     setMenuOpen(false);
@@ -109,6 +111,14 @@ const Header: FC = () => {
               </span>
             )}
             <AiOutlineShoppingCart className="h-6 w-6 hover:text-bg-primary duration-200 max-[986px]:hidden" />
+          </NavLink>
+          <NavLink to={"/compare"} className={"relative"}>
+            {!!compareTotal && (
+              <span className="absolute max-[986px]:hidden top-[-5px] right-[-5px] bg-bg-primary  w-4 rounded-full text-white flex items-center justify-center text-[12px] h-4">
+                {compareTotal}
+              </span>
+            )}
+            <LuGitCompareArrows className="h-6 w-6 hover:text-bg-primary duration-200 max-[986px]:hidden" />
           </NavLink>
           <NavLink to={token ? "/auth/profile/self" : "/auth/sign-in"}>
             {isSuccess ? (
@@ -196,6 +206,17 @@ const Header: FC = () => {
               )}
               <AiOutlineShoppingCart className="h-5 w-5" />
               <p className="text-xs">Cart</p>
+            </div>
+          </NavLink>
+          <NavLink to={"/compare"} className={"relative"}>
+            <div className="flex flex-col items-center hover:text-bg-primary duration-200">
+              {!!compareTotal && (
+                <span className="absolute top-[-5px] right-[-2px] bg-bg-primary  w-4 rounded-full text-white flex items-center justify-center text-[12px] h-4">
+                  {compareTotal}
+                </span>
+              )}
+              <LuGitCompareArrows className="h-5 w-5" />
+              <p className="text-xs">Compare</p>
             </div>
           </NavLink>
           <div className="flex  cursor-pointer flex-col justify-center items-center hover:text-bg-primary duration-200">

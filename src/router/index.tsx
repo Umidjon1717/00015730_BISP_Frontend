@@ -7,6 +7,7 @@ const Self = lazy(() => import("@/pages/auth/profile/self/Self"))
 const MainContactPage = lazy(() => import("@/pages/contact/MainContactPage"));
 const About = lazy(() => import("@/pages/about/About"));
 const MainCart = lazy(() => import("@/pages/cart/MainCart"));
+const Compare = lazy(() => import("@/pages/compare/Compare"));
 const PaymentOptions = lazy(
   () => import("@/pages/payment-options/PaymentOptions")
 );
@@ -66,6 +67,14 @@ const Routers = () => {
               element: (
                 <SuspenseContainer>
                   <MainCart />
+                </SuspenseContainer>
+              ),
+            },
+            {
+              path: "/compare",
+              element: (
+                <SuspenseContainer>
+                  <Compare />
                 </SuspenseContainer>
               ),
             },
