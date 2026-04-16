@@ -7,6 +7,13 @@ const Self = lazy(() => import("@/pages/auth/profile/self/Self"))
 const MainContactPage = lazy(() => import("@/pages/contact/MainContactPage"));
 const About = lazy(() => import("@/pages/about/About"));
 const MainCart = lazy(() => import("@/pages/cart/MainCart"));
+const PaymentOptions = lazy(
+  () => import("@/pages/payment-options/PaymentOptions")
+);
+const Returns = lazy(() => import("@/pages/returns/Returns"));
+const PrivacyPolicy = lazy(
+  () => import("@/pages/privacy-policy/PrivacyPolicy")
+);
 const Wishlist = lazy(() => import("@/pages/wishlist/Wishlits"));
 const Profile = lazy(() => import("@/pages/auth/profile/Profile"));
 const Auth = lazy(() => import("@/pages/auth/Auth"));
@@ -75,6 +82,30 @@ const Routers = () => {
               element: (
                 <SuspenseContainer>
                   <MainContactPage/>
+                </SuspenseContainer>
+              ),
+            },
+            {
+              path: "/payment-options",
+              element: (
+                <SuspenseContainer>
+                  <PaymentOptions />
+                </SuspenseContainer>
+              ),
+            },
+            {
+              path: "/returns",
+              element: (
+                <SuspenseContainer>
+                  <Returns />
+                </SuspenseContainer>
+              ),
+            },
+            {
+              path: "/privacy-policy",
+              element: (
+                <SuspenseContainer>
+                  <PrivacyPolicy />
                 </SuspenseContainer>
               ),
             },
