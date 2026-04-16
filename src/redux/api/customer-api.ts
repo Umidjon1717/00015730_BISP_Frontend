@@ -37,6 +37,28 @@ const extendedApi = mainApi.injectEndpoints({
         body,
       }),
     }),
+    forgotPassword: build.mutation<any, { email: string }>({
+      query: (body) => ({
+        url: "customer/auth/forgot-password",
+        method: "POST",
+        body,
+      }),
+    }),
+    resetPassword: build.mutation<
+      any,
+      {
+        email: string;
+        otp: string;
+        password: string;
+        confirm_password: string;
+      }
+    >({
+      query: (body) => ({
+        url: "customer/auth/reset-password",
+        method: "POST",
+        body,
+      }),
+    }),
     getCustomerById: build.query<ICustomerDataResponse, { id: number }>({
       query: ({ id }) => ({
         url: `customer/${id}`,
@@ -57,6 +79,8 @@ export const {
   useCreateOtpMutation,
   useVerifyOtpMutation,
   useSignInMutation,
+  useForgotPasswordMutation,
+  useResetPasswordMutation,
   useGetCustomerByIdQuery,
   useCheckTokenQuery,
   useSignOutMutation,

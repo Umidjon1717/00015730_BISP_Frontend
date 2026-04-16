@@ -18,6 +18,12 @@ const NotFound = lazy(() => import("@/pages/not-found/NotFound"));
 const SignUp = lazy(() => import("@/pages/auth/sign-up/SignUp"));
 const SignIn = lazy(() => import("@/pages/auth/sign-in/SignIn"));
 const Otp = lazy(() => import("@/pages/auth/otp/Otp"));
+const ForgotPassword = lazy(
+  () => import("@/pages/auth/forgot-password/ForgotPassword")
+);
+const ResetPassword = lazy(
+  () => import("@/pages/auth/reset-password/ResetPassword")
+);
 const Checkout = lazy(() => import("@/pages/checkout/Checkout"));
 
 const Routers = () => {
@@ -166,6 +172,22 @@ const Routers = () => {
           element: (
             <SuspenseContainer>
               <SignUp />
+            </SuspenseContainer>
+          ),
+        },
+        {
+          path: "/forgot-password",
+          element: (
+            <SuspenseContainer>
+              <ForgotPassword />
+            </SuspenseContainer>
+          ),
+        },
+        {
+          path: "/reset-password",
+          element: (
+            <SuspenseContainer>
+              <ResetPassword />
             </SuspenseContainer>
           ),
         },

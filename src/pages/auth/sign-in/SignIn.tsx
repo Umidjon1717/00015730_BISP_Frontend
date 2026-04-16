@@ -172,7 +172,7 @@ const SignIn = () => {
               </span>
             </label>
             <Link
-              to={"#"}
+              to={"/forgot-password"}
               className="text-sm text-black dark:text-white hover:text-bg-primary"
             >
               Forgot password?
