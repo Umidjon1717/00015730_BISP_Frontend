@@ -67,33 +67,37 @@ const Products: FC<IProductProps> = ({ data, title, grid }) => {
         <Discount percent={Number(product.discount?.percent)} />
       )}
 
-      <div className=" dark:bg-zinc-800 transition-colors duration-300 p-4 max-[500px]:p-1">
-        <h2 className="line-clamp-1 text-[20px] font-semibold leading-8 max-[620px]:text-lg">
-          {product.name}
-        </h2>
-        <p className="line-clamp-1 text-gray-500 dark:text-gray-300 text-sm">
-          {product.description}
-        </p>
-        <strong className="text-gray-900 max-sm:text-[14px] dark:text-white text-lg font-semibold">
-          {product.price.toLocaleString()} USD
-        </strong>
-        {!!product.discount?.percent && (
-          <s className="ml-2 text-gray-400 max-sm:text-[12px]">
-            {(
-              product.price /
-              (1 - Number(product.discount?.percent / 100))
-            ).toLocaleString()}{" "}
-            USD
-          </s>
-        )}
-        <button
-          onClick={() => handleCompareToggle(product)}
-          className="mt-4 inline-flex h-10 items-center justify-center rounded-lg border border-gray-300 px-4 text-sm font-semibold text-gray-700 transition hover:border-gray-900 hover:text-gray-900 dark:border-zinc-700 dark:text-gray-200 dark:hover:border-white dark:hover:text-white"
-        >
-          {compareItems.some((item) => item.id === product.id)
-            ? "Remove Compare"
-            : "Compare"}
-        </button>
+      <div className="dark:bg-zinc-800 transition-colors duration-300 p-4 max-[500px]:p-3">
+        <div className="space-y-3">
+          <h2 className="line-clamp-1 text-[20px] font-semibold leading-8 max-[620px]:text-lg">
+            {product.name}
+          </h2>
+          <p className="line-clamp-1 text-gray-500 dark:text-gray-300 text-sm">
+            {product.description}
+          </p>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 pt-1">
+            <strong className="text-gray-900 max-sm:text-[14px] dark:text-white text-lg font-semibold">
+              {product.price.toLocaleString()} USD
+            </strong>
+            {!!product.discount?.percent && (
+              <s className="text-gray-400 max-sm:text-[12px]">
+                {(
+                  product.price /
+                  (1 - Number(product.discount?.percent / 100))
+                ).toLocaleString()}{" "}
+                USD
+              </s>
+            )}
+          </div>
+          <button
+            onClick={() => handleCompareToggle(product)}
+            className="inline-flex h-11 w-full items-center justify-center rounded-lg border border-gray-300 bg-gray-50 px-4 text-sm font-semibold text-gray-700 transition hover:border-gray-900 hover:bg-gray-900 hover:text-white dark:border-zinc-700 dark:bg-zinc-900/60 dark:text-gray-200 dark:hover:border-white dark:hover:bg-white dark:hover:text-zinc-900"
+          >
+            {compareItems.some((item) => item.id === product.id)
+              ? "Remove Compare"
+              : "Compare"}
+          </button>
+        </div>
       </div>
     </div>
   ));
