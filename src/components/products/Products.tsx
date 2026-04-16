@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toggleCompare } from "@/redux/features/compare-slice";
 import { RootState } from "@/redux";
 import toast from "react-hot-toast";
+import { LuGitCompareArrows } from "react-icons/lu";
 
 interface IProductProps {
   data: IProduct[];
@@ -61,6 +62,21 @@ const Products: FC<IProductProps> = ({ data, title, grid }) => {
       <div className="absolute top-2 flex flex-col gap-2 max-sm:gap-1 right-[-50px] group-hover:right-2 duration-300 max-md:right-2">
         <Heart product={product} />
         <CartButton product={product} />
+        <button
+          onClick={() => handleCompareToggle(product)}
+          aria-label={
+            compareItems.some((item) => item.id === product.id)
+              ? "Remove from compare"
+              : "Add to compare"
+          }
+          className={`grid h-10 w-10 place-items-center rounded-full border transition-colors duration-200 ${
+            compareItems.some((item) => item.id === product.id)
+              ? "border-gray-900 bg-gray-900 text-white dark:border-white dark:bg-white dark:text-zinc-900"
+              : "border-gray-300 bg-white/90 text-gray-700 hover:border-gray-900 hover:bg-gray-900 hover:text-white dark:border-zinc-700 dark:bg-zinc-900/90 dark:text-gray-200 dark:hover:border-white dark:hover:bg-white dark:hover:text-zinc-900"
+          }`}
+        >
+          <LuGitCompareArrows className="h-5 w-5" />
+        </button>
       </div>
 
       {!!product.discount?.percent && (
@@ -89,14 +105,6 @@ const Products: FC<IProductProps> = ({ data, title, grid }) => {
               </s>
             )}
           </div>
-          <button
-            onClick={() => handleCompareToggle(product)}
-            className="inline-flex h-11 w-full items-center justify-center rounded-lg border border-gray-300 bg-gray-50 px-4 text-sm font-semibold text-gray-700 transition hover:border-gray-900 hover:bg-gray-900 hover:text-white dark:border-zinc-700 dark:bg-zinc-900/60 dark:text-gray-200 dark:hover:border-white dark:hover:bg-white dark:hover:text-zinc-900"
-          >
-            {compareItems.some((item) => item.id === product.id)
-              ? "Remove Compare"
-              : "Compare"}
-          </button>
         </div>
       </div>
     </div>
