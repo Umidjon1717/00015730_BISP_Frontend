@@ -15,6 +15,19 @@ function assertProdUrlSafe(name: string, url: string) {
   }
 }
 
+export function getGoogleClientId(): string {
+  const configured = (import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined)?.trim();
+  if (import.meta.env.PROD) {
+    if (!configured) {
+      throw new Error("[env] VITE_GOOGLE_CLIENT_ID is required in production.");
+    }
+    return configured;
+  }
+
+  // Local dev fallback only.
+  return configured || "";
+}
+
 export function getApiBaseUrl(): string {
   const configured = (import.meta.env.VITE_BASE_URL as string | undefined)?.trim();
   if (import.meta.env.PROD) {

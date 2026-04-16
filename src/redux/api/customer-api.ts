@@ -37,6 +37,13 @@ const extendedApi = mainApi.injectEndpoints({
         body,
       }),
     }),
+    googleSignIn: build.mutation<any, { idToken: string }>({
+      query: (body) => ({
+        url: "customer/auth/google",
+        method: "POST",
+        body,
+      }),
+    }),
     forgotPassword: build.mutation<any, { email: string }>({
       query: (body) => ({
         url: "customer/auth/forgot-password",
@@ -79,6 +86,7 @@ export const {
   useCreateOtpMutation,
   useVerifyOtpMutation,
   useSignInMutation,
+  useGoogleSignInMutation,
   useForgotPasswordMutation,
   useResetPasswordMutation,
   useGetCustomerByIdQuery,

@@ -4,7 +4,9 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { useSignInMutation } from "@/redux/api/customer-api";
+import { GoogleLogin } from "@react-oauth/google";
+import toast from "react-hot-toast";
+import { useGoogleSignInMutation, useSignInMutation } from "@/redux/api/customer-api";
 import { useDispatch, useSelector } from "react-redux";
 import { saveToken } from "@/redux/features/token-slice";
 import { saveStorage } from "@/utils";
@@ -39,11 +41,31 @@ const SignIn = () => {
   const [setWishlist] = useSetWishlistMutation();
 
   const [signIn] = useSignInMutation();
+  const [googleSignIn] = useGoogleSignInMutation();
   const [lgError, setlgError] = useState("");
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
   };
   const dispatch = useDispatch();
+
+  const handleSignedIn = (res: any) => {
+    dispatch(saveToken(res?.data?.access_token));
+    saveStorage("access_token", res?.data?.access_token);
+    setlgError("");
+    if (wishlist.length) {
+      setWishlist({
+        customerId: res?.data?.id,
+        wishlist: wishlist.map((item) => item.id),
+      })
+        .unwrap()
+        .then(() => {
+          dispatch(clearWishlist());
+        });
+    }
+    getParam("q") === "checkout"
+      ? navigate("/checkout")
+      : navigate("/auth/profile/self");
+  };
 
   const {
     register,
@@ -63,22 +85,7 @@ const SignIn = () => {
       .unwrap()
       .then((res) => {
         if (res?.data?.is_active) {
-          dispatch(saveToken(res?.data?.access_token));
-          saveStorage("access_token", res?.data?.access_token);
-          setlgError("");
-          if (wishlist.length) {
-            setWishlist({
-              customerId: res?.data?.id,
-              wishlist: wishlist.map((item) => item.id),
-            })
-              .unwrap()
-              .then(() => {
-                dispatch(clearWishlist());
-              });
-          }
-          getParam("q") === "checkout"
-            ? navigate("/checkout")
-            : navigate("/auth/profile/self");
+          handleSignedIn(res);
         } else {
           dispatch(saveEmail({ email: data.email }));
           return navigate("/auth/otp");
@@ -95,6 +102,35 @@ const SignIn = () => {
         }
       });
   };
+
+  const onGoogleSuccess = async (credential: string | undefined) => {
+    if (!credential) {
+      toast.error("Google sign-in failed", { position: "top-right" });
+      return;
+    }
+    try {
+      const res = await googleSignIn({ idToken: credential }).unwrap();
+      if (res?.data?.access_token) {
+        handleSignedIn(res);
+        return;
+      }
+      toast.error("Google sign-in failed", { position: "top-right" });
+    } catch (err: any) {
+      const errorMessage = err?.data?.message;
+      const message =
+        typeof errorMessage === "string"
+          ? errorMessage
+          : Array.isArray(errorMessage)
+            ? errorMessage[0]
+            : "Google sign-in failed";
+      setlgError(message);
+      toast.error(message, { position: "top-right" });
+    }
+  };
+
+  const googleClientId = (
+    import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined
+  )?.trim();
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center p-4">
@@ -183,6 +219,27 @@ const SignIn = () => {
             Sign In
           </button>
         </form>
+
+        {googleClientId ? (
+          <>
+            <div className="my-6 flex items-center gap-3">
+              <div className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
+              <span className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                Or
+              </span>
+              <div className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
+            </div>
+
+            <div className="flex justify-center">
+              <GoogleLogin
+                onSuccess={(cred) => onGoogleSuccess(cred.credential)}
+                onError={() =>
+                  toast.error("Google sign-in failed", { position: "top-right" })
+                }
+              />
+            </div>
+          </>
+        ) : null}
 
         <div className="mt-6 text-center text-sm text-gray-600 dark:text-gray-300">
           Don't have an account?{" "}

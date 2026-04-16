@@ -6,6 +6,7 @@ const baseQuery = async (args: any, api: any, extraOptions: any) => {
   const { dispatch } = api;
   const rawBaseQuery = fetchBaseQuery({
     baseUrl: getApiBaseUrl(),
+    credentials: "include",
     prepareHeaders: (headers) => {
       const token = localStorage.getItem("access_token") as string;
       if (token) {
