@@ -9,10 +9,12 @@ import ins1 from "@/assets/images/ins1.png";
 import ins2 from "@/assets/images/inst2.png";
 import ins3 from "@/assets/images/inst3.png";
 import "./Insparation.scss";
+import { useNavigate } from "react-router-dom";
 
 SwiperCore.use([Navigation, Pagination, EffectCoverflow]);
 
 const Insparation = () => {
+  const navigate = useNavigate();
   const images = [
     {
       src: ins1,
@@ -39,7 +41,7 @@ const Insparation = () => {
             Our designers have crafted a variety of beautiful room prototypes to
             inspire your next space transformation.
           </p>
-          <button className="bg-[#B88E2F] hover:bg-[#9C792A] text-white py-3 px-6 rounded-md shadow-md font-medium transition-all">
+          <button onClick={() => navigate("/shop")} className="bg-[#B88E2F] hover:bg-[#9C792A] text-white py-3 px-6 rounded-md shadow-md font-medium transition-all">
             Explore More
           </button>
         </div>
