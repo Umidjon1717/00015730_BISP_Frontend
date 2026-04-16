@@ -16,7 +16,7 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="w-full border-t border-gray-200 bg-gradient-to-b from-white to-gray-50 py-16 pb-20 text-gray-900 dark:border-zinc-800 dark:bg-zinc-900 dark:text-white">
+    <footer className="w-full border-t border-gray-200 bg-gradient-to-b from-white to-gray-50 py-16 pb-20 text-gray-900 dark:border-zinc-800 dark:from-zinc-900 dark:to-zinc-950 dark:text-white">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-2 xl:grid-cols-[1.2fr_0.9fr_1fr_1.2fr]">
           <div className="space-y-5">

@@ -25,7 +25,12 @@ export const DarkModeProvider: React.FC<PropsWithChildren<{}>> = ({
 
   useEffect(() => {
     localStorage.setItem("darkMode", JSON.stringify(isDarkMode));
-    document.body.className = isDarkMode ? "dark" : "light";
+    // Tailwind's `darkMode: "class"` activates when a parent has `class="dark"`.
+    // Toggle it on <html> to avoid clobbering existing <body> classes.
+    document.documentElement.classList.toggle("dark", isDarkMode);
+    // Keep legacy global styles (see `src/sass/index.scss`) working too.
+    document.body.classList.toggle("dark", isDarkMode);
+    document.body.classList.toggle("light", !isDarkMode);
   }, [isDarkMode]);
 
   const toggleDarkMode = () => setIsDarkMode((prev) => !prev);
