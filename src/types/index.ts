@@ -84,7 +84,7 @@ export interface ISignInResponse {
 
 export interface IOrderResponse {
   data: {
-    order: any[];
+    order: unknown[];
   };
 }
 
