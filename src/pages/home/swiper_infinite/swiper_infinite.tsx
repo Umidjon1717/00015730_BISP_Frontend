@@ -1,8 +1,8 @@
 import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import "swiper/css";
-import "swiper/css/free-mode";
-import "swiper/css/autoplay";
+// import "swiper/css";
+// import "swiper/css/free-mode";
+// import "swiper/css/autoplay";
 import { FreeMode, Autoplay } from "swiper/modules";
 import image from "@/assets/images/Images.svg";
 

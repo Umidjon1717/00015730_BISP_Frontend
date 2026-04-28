@@ -1,10 +1,10 @@
 import { Navigation, Pagination, EffectCoverflow } from "swiper/modules";
 import SwiperCore from "swiper";
 import { Swiper, SwiperSlide } from "swiper/react";
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
-import "swiper/css/effect-coverflow";
+// import "swiper/css";
+// import "swiper/css/navigation";
+// import "swiper/css/pagination";
+// import "swiper/css/effect-coverflow";
 import ins1 from "@/assets/images/ins1.png";
 import ins2 from "@/assets/images/inst2.png";
 import ins3 from "@/assets/images/inst3.png";
