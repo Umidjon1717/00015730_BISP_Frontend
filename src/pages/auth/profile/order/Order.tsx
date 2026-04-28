@@ -16,7 +16,7 @@ const Order = () => {
 
   const [cancelOrder, { isLoading: cancelLoading }] = useCancelOrderMutation();
   const { data: orderData, isLoading, refetch } = useGetOrderByCustomerIdQuery(
-    data?.customer?.id,
+    data!.customer!.id!,
     {
       skip: Boolean(!data),
     }

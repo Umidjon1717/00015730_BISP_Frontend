@@ -1,4 +1,5 @@
 import { mainApi } from "./index";
+import { ICategoryResponse } from "@/types";
 
 const extendedApi = mainApi.injectEndpoints({
   endpoints: (build) => ({
@@ -10,7 +11,7 @@ const extendedApi = mainApi.injectEndpoints({
       }),
       providesTags: ["Category"],
     }),
-    getSingleCategory: build.query({
+    getSingleCategory: build.query<ICategoryResponse, number | undefined>({
       query: (id) => ({
         url: `category/${id}`,
         method: "GET",

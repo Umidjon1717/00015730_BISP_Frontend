@@ -63,3 +63,35 @@ export interface OtpResponse {
   statusCode: number;
   message: string;
 }
+
+export interface ICheckTokenResponse {
+  customer: ICustomer;
+}
+
+export interface IWishlistResponse {
+  data: {
+    products: IProduct[];
+  };
+}
+
+export interface ISignInResponse {
+  data: {
+    access_token: string;
+    id: number;
+    is_active: boolean;
+  };
+}
+
+export interface IOrderResponse {
+  data: {
+    order: any[];
+  };
+}
+
+export interface ICategoryResponse {
+  data: {
+    category: {
+      name: string;
+    };
+  };
+}

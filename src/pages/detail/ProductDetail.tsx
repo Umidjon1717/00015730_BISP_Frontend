@@ -4,7 +4,7 @@ import "./Detail.scss";
 import { FaFacebook } from "react-icons/fa";
 import { FaLinkedin } from "react-icons/fa";
 import { FaTwitter } from "react-icons/fa";
-import { IProduct, IReview } from "@/types";
+import { IProduct, IReview, ICategoryResponse } from "@/types";
 import { useDispatch, useSelector } from "react-redux";
 import { addCart } from "../../redux/features/cart-slice";
 import { RootState } from "../../redux";
@@ -19,7 +19,7 @@ const ProductDetail = ({
   id,
 }: {
   product: IProduct;
-  category: any;
+  category: ICategoryResponse;
   id: number;
 }) => {
   const [selectedImage, setSelectedImage] = useState(0);

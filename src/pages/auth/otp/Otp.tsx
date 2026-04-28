@@ -59,7 +59,7 @@ export default function OTPInput() {
           dispatch(saveToken(res.access_token));
           if (wishlist.length) {
             setWishlist({
-              customerId: res?.id,
+              customerId: res.id!,
               wishlist: wishlist.map((item) => item.id),
             })
               .unwrap()

@@ -15,7 +15,7 @@ const DarkModeContext = createContext<DarkModeContextType | undefined>(
   undefined
 );
 
-export const DarkModeProvider: React.FC<PropsWithChildren<{}>> = ({
+export const DarkModeProvider: React.FC<PropsWithChildren<object>> = ({
   children,
 }) => {
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
@@ -42,6 +42,7 @@ export const DarkModeProvider: React.FC<PropsWithChildren<{}>> = ({
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useDarkMode = (): DarkModeContextType => {
   const context = useContext(DarkModeContext);
   if (!context) {

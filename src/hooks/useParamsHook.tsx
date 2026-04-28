@@ -40,7 +40,7 @@ export const useParamsHook = () => {
 
   const getParams = (): Params => {
     const params: Params = {};
-    for (let [key, value] of searchParams.entries()) {
+    for (const [key, value] of searchParams.entries()) {
       params[key] = value;
     }
     return params;

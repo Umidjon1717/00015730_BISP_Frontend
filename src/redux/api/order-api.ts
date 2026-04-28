@@ -1,8 +1,9 @@
 import { mainApi } from "./index";
+import { IOrderResponse } from "@/types";
 
 const extendedApi = mainApi.injectEndpoints({
   endpoints: (build) => ({
-    createOrder: build.mutation<any, any>({
+    createOrder: build.mutation<unknown, unknown>({
       query: (body) => ({
         // url: `http://localhost:3000/api/order`,
         url: "order",
@@ -11,14 +12,14 @@ const extendedApi = mainApi.injectEndpoints({
       }),
       invalidatesTags: ["Order"],
     }),
-    getOrderByCustomerId: build.query<any, number>({
+    getOrderByCustomerId: build.query<IOrderResponse, number>({
       query: (customer_id) => ({
         url: `order/${customer_id}`,
         method: "GET",
       }),
       providesTags: ["Order"],
     }),
-    cancelOrder: build.mutation<any, number>({
+    cancelOrder: build.mutation<unknown, number>({
       query: (id) => ({
         url: `order/${id}`,
         method: "PATCH",

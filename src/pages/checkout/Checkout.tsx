@@ -24,6 +24,14 @@ const schema = yup
   })
   .required();
 
+interface CheckoutFormData {
+  street: string;
+  region: string;
+  zip_code: number;
+  district: string;
+  additional_info?: string;
+}
+
 const Checkout = () => {
   const dispatch = useDispatch();
   const { data } = useCheckTokenQuery(null);
@@ -55,12 +63,12 @@ const Checkout = () => {
     },
   });
 
-  const onSubmit: SubmitHandler<any> = (address) => {
+  const onSubmit: SubmitHandler<CheckoutFormData> = (address) => {
     const total_price = cart?.reduce(
       (sum, product) => sum + product.price * product.amount,
       0
     );
-    let order = {
+    const order = {
       customerId: data?.customer?.id,
       address,
       order_details: cart?.map((product) => ({

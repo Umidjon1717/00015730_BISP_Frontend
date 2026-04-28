@@ -1,16 +1,16 @@
-import { ICustomer, ICustomerDataResponse, OtpResponse } from "@/types";
+import { ICustomer, ICustomerDataResponse, OtpResponse, ICheckTokenResponse, ISignInResponse } from "@/types";
 import { mainApi } from "./index";
 
 const extendedApi = mainApi.injectEndpoints({
   endpoints: (build) => ({
-    createCustomer: build.mutation<any, ICustomer>({
+    createCustomer: build.mutation<unknown, ICustomer>({
       query: (body) => ({
         url: "customer/auth/signup",
         method: "POST",
         body,
       }),
     }),
-    checkToken: build.query<any, any>({
+    checkToken: build.query<ICheckTokenResponse, unknown>({
       query: () => ({
         url: "customer/auth/check-token",
         method: "GET",
@@ -30,21 +30,21 @@ const extendedApi = mainApi.injectEndpoints({
         body,
       }),
     }),
-    signIn: build.mutation<any, { email: string; password: string }>({
+    signIn: build.mutation<ISignInResponse, { email: string; password: string }>({
       query: (body) => ({
         url: "customer/auth/signin",
         method: "POST",
         body,
       }),
     }),
-    googleSignIn: build.mutation<any, { idToken: string }>({
+    googleSignIn: build.mutation<ISignInResponse, { idToken: string }>({
       query: (body) => ({
         url: "customer/auth/google",
         method: "POST",
         body,
       }),
     }),
-    forgotPassword: build.mutation<any, { email: string }>({
+    forgotPassword: build.mutation<unknown, { email: string }>({
       query: (body) => ({
         url: "customer/auth/forgot-password",
         method: "POST",
@@ -52,7 +52,7 @@ const extendedApi = mainApi.injectEndpoints({
       }),
     }),
     resetPassword: build.mutation<
-      any,
+      unknown,
       {
         email: string;
         otp: string;
@@ -72,7 +72,7 @@ const extendedApi = mainApi.injectEndpoints({
         method: "GET",
       }),
     }),
-    signOut: build.mutation<any, any>({
+    signOut: build.mutation<unknown, unknown>({
       query: () => ({
         url: "customer/auth/signout",
         method: "POST",

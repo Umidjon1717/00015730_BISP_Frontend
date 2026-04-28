@@ -1,21 +1,44 @@
 import { IGetResponseProducts, IProduct, IProductQuery } from "@/types";
 import { mainApi } from "./index";
 
-function normalizeProductsResponse(res: any): IGetResponseProducts {
+interface RawProductResponse {
+  statusCode?: number;
+  status?: number;
+  message?: string;
+  data?: {
+    products?: IProduct[];
+    page?: number;
+    limit?: number;
+    total?: number;
+    totalPages?: number;
+  };
+  products?: IProduct[];
+  page?: number;
+  limit?: number;
+  total?: number;
+  totalPages?: number;
+}
+
+function normalizeProductsResponse(res: unknown): IGetResponseProducts {
+  const response = (res ?? {}) as RawProductResponse;
+
   // Expected shape in this app:
   // { statusCode, message, data: { products, page, limit, total, totalPages } }
   const products: IProduct[] | undefined =
-    res?.data?.products ??
-    res?.products ??
-    res?.data ??
-    (Array.isArray(res) ? res : undefined);
+    Array.isArray(response?.data?.products)
+      ? response.data.products
+      : Array.isArray(response?.products)
+      ? response.products
+      : Array.isArray(response?.data)
+      ? response.data
+      : Array.isArray(res)
+      ? res
+      : undefined;
 
   if (!Array.isArray(products)) {
-    // Never throw here — throwing breaks rendering and leaves the UI in a "no data" state.
-    // Fall back to empty so the app remains usable even if backend shape changes.
     return {
-      statusCode: Number(res?.statusCode ?? res?.status ?? 200),
-      message: String(res?.message ?? "OK"),
+      statusCode: Number(response?.statusCode ?? response?.status ?? 200),
+      message: String(response?.message ?? "OK"),
       data: {
         products: [],
         page: 1,
@@ -26,14 +49,14 @@ function normalizeProductsResponse(res: any): IGetResponseProducts {
     };
   }
 
-  const page = Number(res?.data?.page ?? res?.page ?? 1);
-  const limit = Number(res?.data?.limit ?? res?.limit ?? products.length);
-  const total = Number(res?.data?.total ?? res?.total ?? products.length);
-  const totalPages = Number(res?.data?.totalPages ?? res?.totalPages ?? 1);
+  const page = Number(response?.data?.page ?? response?.page ?? 1);
+  const limit = Number(response?.data?.limit ?? response?.limit ?? products.length);
+  const total = Number(response?.data?.total ?? response?.total ?? products.length);
+  const totalPages = Number(response?.data?.totalPages ?? response?.totalPages ?? 1);
 
   return {
-    statusCode: Number(res?.statusCode ?? res?.status ?? 200),
-    message: String(res?.message ?? "OK"),
+    statusCode: Number(response?.statusCode ?? response?.status ?? 200),
+    message: String(response?.message ?? "OK"),
     data: {
       products,
       page,
@@ -52,7 +75,7 @@ const extendedApi = mainApi.injectEndpoints({
         method: "GET",
         params,
       }),
-      transformResponse: (res: any) => normalizeProductsResponse(res),
+      transformResponse: (res: unknown) => normalizeProductsResponse(res),
       providesTags: ["Product"],
     }),
     getSingleProduct: build.query<IProduct, number>({

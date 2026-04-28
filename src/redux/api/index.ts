@@ -1,8 +1,8 @@
-import { fetchBaseQuery, retry, createApi } from "@reduxjs/toolkit/query/react";
+import { fetchBaseQuery, retry, createApi, BaseQueryFn, FetchArgs, FetchBaseQueryError } from "@reduxjs/toolkit/query/react";
 import { clearToken } from "../features/token-slice";
 import { getApiBaseUrl } from "@/config/env";
 
-const baseQuery = async (args: any, api: any, extraOptions: any) => {
+const baseQuery: BaseQueryFn<FetchArgs, unknown, FetchBaseQueryError> = async (args, api, extraOptions) => {
   const { dispatch } = api;
   const rawBaseQuery = fetchBaseQuery({
     baseUrl: getApiBaseUrl(),
