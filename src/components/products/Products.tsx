@@ -1,4 +1,4 @@
-import { FC, memo } from "react";
+import { FC, memo, ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { IProduct } from "../../types";
 import Heart from "./Heart";
@@ -13,7 +13,7 @@ import { LuGitCompareArrows } from "react-icons/lu";
 
 interface IProductProps {
   data: IProduct[];
-  title?: any;
+  title?: ReactNode;
   grid?: boolean;
 }
 const Products: FC<IProductProps> = ({ data, title, grid }) => {
