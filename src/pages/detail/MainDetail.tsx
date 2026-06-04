@@ -7,6 +7,7 @@ import ProductDetail from "./ProductDetail";
 import { useGetSingleCategoryQuery } from "../../redux/api/category-api";
 import RelatedProducts from "./RelatedProducts";
 import Hero from "./Hero";
+import AiRecommendations from "@/components/ai-recommendations/AiRecommendations";
 
 const MainDetail = () => {
   const { id } = useParams();
@@ -40,6 +41,7 @@ const MainDetail = () => {
           productId={Number(product.id)}
         />
       )}
+      <AiRecommendations productId={Number(id)} />
     </>
   );
 };

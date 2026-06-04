@@ -8,6 +8,14 @@ export const links = [
     href: "/shop",
   },
   {
+    title: "AI Search",
+    href: "/ai-search",
+  },
+  {
+    title: "Room Style",
+    href: "/room-style",
+  },
+  {
     title: "About",
     href: "/about",
   },
