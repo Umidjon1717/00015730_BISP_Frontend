@@ -76,12 +76,12 @@ const Header: FC = () => {
             Furnishings
           </h2>
         </div>
-        <div className="flex items-center gap-12 max-[986px]:hidden">
+        <div className="flex items-center gap-5 max-[1100px]:gap-4 max-[986px]:hidden">
           {links?.map((link) => (
             <NavLink
               to={link.href}
               key={link.href}
-              className="text-center font-medium text-lg hover:text-bg-primary duration-200"
+              className="whitespace-nowrap font-medium text-base max-[1100px]:text-sm hover:text-bg-primary duration-200"
             >
               {link.title}
             </NavLink>
