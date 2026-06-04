@@ -13,32 +13,14 @@ export interface AiChatResponse {
 export interface AiProduct {
   id: number;
   name: string;
-  description?: string;
+  description: string;
   price: number;
   category?: string;
   colors?: string[];
   tags?: string[];
-  stock?: number;
+  stock: number;
   images?: string[];
   discount?: { percent: number };
-}
-
-export interface GenerateRoomRequest {
-  roomName: string;
-  width: number;
-  length: number;
-  style?: string;
-  budget?: number;
-}
-
-export interface GenerateRoomResponse {
-  imageUrl: string;
-  roomName: string;
-  dimensions: string;
-  style: string;
-  selectedProducts: AiProduct[];
-  layoutDescription: string;
-  totalEstimate: number;
 }
 
 export interface AiSearchResponse {
@@ -89,15 +71,4 @@ export function aiRoomStyle(description: string, budget?: number): Promise<AiRoo
   const body: Record<string, unknown> = { description };
   if (budget !== undefined && budget > 0) body.budget = budget;
   return post("/ai/room-style", body);
-}
-
-export function aiGenerateRoom(req: GenerateRoomRequest): Promise<GenerateRoomResponse> {
-  const body: Record<string, unknown> = {
-    roomName: req.roomName,
-    width: req.width,
-    length: req.length,
-  };
-  if (req.style?.trim()) body.style = req.style.trim();
-  if (req.budget && req.budget > 0) body.budget = req.budget;
-  return post("/ai/generate-room", body);
 }
