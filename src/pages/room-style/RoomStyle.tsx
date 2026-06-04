@@ -1,29 +1,7 @@
 import { useState } from "react";
 import { aiRoomStyle, AiProduct } from "@/utils/ai-api";
-import { resolveImageUrl } from "@/config/env";
-import { useDispatch } from "react-redux";
-import { addCart } from "@/redux/features/cart-slice";
-import { useNavigate } from "react-router-dom";
-import { IProduct } from "@/types";
 import { BsStars, BsLightbulb } from "react-icons/bs";
-
-function toIProduct(p: AiProduct): IProduct {
-  return {
-    id: p.id,
-    name: p.name,
-    description: p.description,
-    price: p.price,
-    images: p.images ?? [],
-    colors: p.colors ?? [],
-    tags: p.tags ?? [],
-    stock: p.stock,
-    is_liked: false,
-    averageRating: 0,
-    sku: "",
-    discount: { percent: 0 },
-    reviews: [],
-  };
-}
+import AiProductCard from "@/components/ai-product-card/AiProductCard";
 
 const RoomStyle = () => {
   const [description, setDescription] = useState("");
@@ -35,8 +13,6 @@ const RoomStyle = () => {
     designTips: string;
     totalEstimate: number;
   } | null>(null);
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const handleSubmit = async () => {
     const desc = description.trim();
@@ -159,50 +135,7 @@ const RoomStyle = () => {
                 </h2>
                 <div className="grid grid-cols-4 gap-6 max-[1240px]:grid-cols-3 max-[990px]:grid-cols-2 max-[620px]:gap-4 max-[500px]:grid-cols-1">
                   {result.suggestions.map((p) => (
-                    <div
-                      key={p.id}
-                      className="group bg-white dark:bg-zinc-800 rounded-xl shadow overflow-hidden"
-                    >
-                      <div
-                        onClick={() => navigate(`/product/${p.id}`)}
-                        className="relative h-[240px] max-[620px]:h-[200px] overflow-hidden cursor-pointer bg-gray-100 dark:bg-zinc-700"
-                      >
-                        {p.images?.[0] ? (
-                          <img
-                            src={resolveImageUrl(p.images[0])}
-                            alt={p.name}
-                            className="w-full h-full object-cover group-hover:scale-[1.02] transition-all duration-300"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-300 dark:text-zinc-600 text-6xl">
-                            🪑
-                          </div>
-                        )}
-                      </div>
-                      <div className="p-4 space-y-2">
-                        <h3 className="font-semibold line-clamp-1 dark:text-white">{p.name}</h3>
-                        <p className="text-gray-500 dark:text-gray-400 text-sm line-clamp-2">
-                          {p.description}
-                        </p>
-                        <strong className="block text-gray-900 dark:text-white">
-                          {p.price.toLocaleString()} USD
-                        </strong>
-                        <div className="flex gap-2 pt-1">
-                          <button
-                            onClick={() => navigate(`/product/${p.id}`)}
-                            className="flex-1 border border-bg-primary text-bg-primary py-2 rounded-lg text-sm hover:bg-bg-primary hover:text-white transition-colors"
-                          >
-                            View
-                          </button>
-                          <button
-                            onClick={() => dispatch(addCart(toIProduct(p)))}
-                            className="flex-1 bg-bg-primary text-white py-2 rounded-lg text-sm hover:bg-amber-600 transition-colors"
-                          >
-                            Add to Cart
-                          </button>
-                        </div>
-                      </div>
-                    </div>
+                    <AiProductCard key={p.id} product={p} variant="grid" />
                   ))}
                 </div>
               </div>
@@ -212,7 +145,7 @@ const RoomStyle = () => {
 
         {/* Empty state before first submit */}
         {!result && !loading && !error && (
-          <div className="text-center py-16 text-gray-300 dark:text-zinc-600 select-none">
+          <div className="text-center py-16 select-none">
             <div className="text-6xl mb-4">🛋️</div>
             <p className="text-gray-400 dark:text-gray-500">
               Fill in the form above to get AI-curated furniture suggestions

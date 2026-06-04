@@ -1,29 +1,7 @@
 import { useState } from "react";
 import { aiSearch, AiProduct } from "@/utils/ai-api";
-import { resolveImageUrl } from "@/config/env";
-import { useDispatch } from "react-redux";
-import { addCart } from "@/redux/features/cart-slice";
-import { useNavigate } from "react-router-dom";
-import { IProduct } from "@/types";
 import { BsStars } from "react-icons/bs";
-
-function toIProduct(p: AiProduct): IProduct {
-  return {
-    id: p.id,
-    name: p.name,
-    description: p.description,
-    price: p.price,
-    images: p.images ?? [],
-    colors: p.colors ?? [],
-    tags: p.tags ?? [],
-    stock: p.stock,
-    is_liked: false,
-    averageRating: 0,
-    sku: "",
-    discount: { percent: 0 },
-    reviews: [],
-  };
-}
+import AiProductCard from "@/components/ai-product-card/AiProductCard";
 
 const AiSearch = () => {
   const [query, setQuery] = useState("");
@@ -31,8 +9,6 @@ const AiSearch = () => {
   const [results, setResults] = useState<AiProduct[] | null>(null);
   const [explanation, setExplanation] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const handleSearch = async () => {
     const trimmed = query.trim();
@@ -132,48 +108,7 @@ const AiSearch = () => {
             ) : (
               <div className="grid grid-cols-4 gap-8 max-[1240px]:grid-cols-3 max-[990px]:grid-cols-2 max-[620px]:gap-4 max-[500px]:grid-cols-1">
                 {results.map((p) => (
-                  <div
-                    key={p.id}
-                    className="group bg-white dark:bg-zinc-800 rounded-lg shadow overflow-hidden"
-                  >
-                    <div
-                      onClick={() => navigate(`/product/${p.id}`)}
-                      className="relative h-[280px] max-[620px]:h-[220px] overflow-hidden cursor-pointer bg-gray-100 dark:bg-zinc-700"
-                    >
-                      {p.images?.[0] ? (
-                        <img
-                          src={resolveImageUrl(p.images[0])}
-                          alt={p.name}
-                          className="w-full h-full object-cover group-hover:scale-[1.02] transition-all duration-300"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gray-300 dark:text-zinc-600 text-6xl">
-                          🪑
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-4 space-y-2">
-                      <h2 className="line-clamp-1 text-lg font-semibold dark:text-white">{p.name}</h2>
-                      <p className="line-clamp-2 text-gray-500 dark:text-gray-400 text-sm">{p.description}</p>
-                      <strong className="block text-gray-900 dark:text-white font-semibold">
-                        {p.price.toLocaleString()} USD
-                      </strong>
-                      <div className="flex gap-2 pt-1">
-                        <button
-                          onClick={() => navigate(`/product/${p.id}`)}
-                          className="flex-1 border border-bg-primary text-bg-primary py-2 rounded-lg text-sm hover:bg-bg-primary hover:text-white transition-colors"
-                        >
-                          View
-                        </button>
-                        <button
-                          onClick={() => dispatch(addCart(toIProduct(p)))}
-                          className="flex-1 bg-bg-primary text-white py-2 rounded-lg text-sm hover:bg-amber-600 transition-colors"
-                        >
-                          Add to Cart
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                  <AiProductCard key={p.id} product={p} variant="grid" />
                 ))}
               </div>
             )}
@@ -182,7 +117,7 @@ const AiSearch = () => {
 
         {/* Empty state before first search */}
         {results === null && !loading && !error && (
-          <div className="text-center py-20 text-gray-300 dark:text-zinc-600 select-none">
+          <div className="text-center py-20 select-none">
             <div className="text-6xl mb-4">🔍</div>
             <p className="text-gray-400 dark:text-gray-500">Enter a description above to search with AI</p>
           </div>
