@@ -28,6 +28,7 @@ export type RBProduct = {
   colors: string[];
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const CATEGORY_COLORS: Record<number, string> = {
   1: "#8B7355",
   2: "#6B8CAE",
