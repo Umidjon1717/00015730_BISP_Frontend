@@ -16,6 +16,10 @@ export const links = [
     href: "/room-style",
   },
   {
+    title: "Room Builder",
+    href: "/room-builder",
+  },
+  {
     title: "About",
     href: "/about",
   },

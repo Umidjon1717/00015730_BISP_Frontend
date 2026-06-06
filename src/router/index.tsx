@@ -35,6 +35,7 @@ const ResetPassword = lazy(
 const Checkout = lazy(() => import("@/pages/checkout/Checkout"));
 const AiSearch = lazy(() => import("@/pages/ai-search/AiSearch"));
 const RoomStyle = lazy(() => import("@/pages/room-style/RoomStyle"));
+const RoomBuilder = lazy(() => import("@/pages/room-builder/RoomBuilder"));
 
 const Routers = () => {
   return (
@@ -149,6 +150,14 @@ const Routers = () => {
               element: (
                 <SuspenseContainer>
                   <RoomStyle />
+                </SuspenseContainer>
+              ),
+            },
+            {
+              path: "/room-builder",
+              element: (
+                <SuspenseContainer>
+                  <RoomBuilder />
                 </SuspenseContainer>
               ),
             },
