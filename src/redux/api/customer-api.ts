@@ -78,6 +78,12 @@ const extendedApi = mainApi.injectEndpoints({
         method: "POST",
       }),
     }),
+    deleteAccount: build.mutation<{ statusCode: number; message: string }, void>({
+      query: () => ({
+        url: "customer/auth/account",
+        method: "DELETE",
+      }),
+    }),
   }),
 });
 
@@ -92,4 +98,5 @@ export const {
   useGetCustomerByIdQuery,
   useCheckTokenQuery,
   useSignOutMutation,
+  useDeleteAccountMutation,
 } = extendedApi;
