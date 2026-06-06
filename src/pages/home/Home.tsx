@@ -3,9 +3,12 @@ import { useGetProductsQuery } from "../../redux/api/product-api";
 import Hero from "./Hero";
 import Products from "../../components/products/Products";
 import Browse from "./Browse";
-import SwiperInfinite from "./swiper_infinite/swiper_infinite";
 import Insparation from "./Insparation";
 import Skeleton from "../../components/products/Skeleton";
+import Stats from "./Stats";
+import Features from "./Features";
+import Testimonials from "./Testimonials";
+import Gallery from "./Gallery";
 
 const Home = () => {
   const { data, isLoading, isError } = useGetProductsQuery({ limit: 8 });
@@ -13,6 +16,7 @@ const Home = () => {
     <div>
       <Hero />
       <Browse />
+      <Stats />
       {isLoading ? (
         <Skeleton count={8} />
       ) : isError ? (
@@ -26,8 +30,10 @@ const Home = () => {
           No products found yet.
         </div>
       )}
+      <Features />
       <Insparation />
-      <SwiperInfinite />
+      <Testimonials />
+      <Gallery />
     </div>
   );
 };
