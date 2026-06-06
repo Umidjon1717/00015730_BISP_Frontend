@@ -47,12 +47,16 @@ export default function RoomBuilder() {
 
   // Fetch products from the furniture API
   useEffect(() => {
-    fetch("https://furnishing-main.onrender.com/api/product")
+    fetch("https://zero0015730-bisp-backend.onrender.com/api/products")
       .then((r) => r.json())
       .then((data) => {
         const arr: RBProduct[] = Array.isArray(data)
           ? data
-          : (data?.data ?? data?.products ?? []);
+          : Array.isArray(data?.data?.products)
+          ? data.data.products
+          : Array.isArray(data?.data)
+          ? data.data
+          : [];
         setProducts(arr);
       })
       .catch(() => {})
