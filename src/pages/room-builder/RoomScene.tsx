@@ -379,12 +379,6 @@ function Room({ size }: { size: number }) {
         <meshStandardMaterial color="#ede9e2" roughness={0.95} />
       </mesh>
 
-      {/* Ceiling */}
-      <mesh position={[0, wallH, 0]} rotation={[Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[size, size]} />
-        <meshStandardMaterial color="#f8f5f0" roughness={1} side={THREE.BackSide} />
-      </mesh>
-
       {/* Baseboard back */}
       <mesh position={[0, 0.06, -half + 0.01]} castShadow>
         <boxGeometry args={[size, 0.12, 0.02]} />
