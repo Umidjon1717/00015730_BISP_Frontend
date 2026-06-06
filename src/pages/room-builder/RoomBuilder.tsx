@@ -21,6 +21,15 @@ const ROOM_SIZES = [
   { label: "Large 8×8m", size: 8 },
 ];
 
+// Realistic default dimensions per category (meters) — used when API has no dims
+const CATEGORY_DIMS: Record<number, { width: number; length: number; height: number }> = {
+  1: { width: 2.0,  length: 0.95, height: 0.88 }, // Sofa
+  2: { width: 1.6,  length: 2.0,  height: 0.55 }, // Bed
+  3: { width: 1.6,  length: 0.9,  height: 0.76 }, // Dining table
+  4: { width: 1.4,  length: 0.65, height: 0.76 }, // Desk
+  5: { width: 1.5,  length: 0.55, height: 0.82 }, // Outdoor bench
+  6: { width: 0.4,  length: 0.4,  height: 1.7  }, // Floor lamp
+};
 const DEFAULT_DIMS = { width: 1, length: 1, height: 0.8 };
 
 function uid(): string {
@@ -118,17 +127,18 @@ export default function RoomBuilder() {
   );
 
   const handleAddToRoom = useCallback((product: RBProduct) => {
-    const w = clampDim(product.width, DEFAULT_DIMS.width);
-    const l = clampDim(product.length, DEFAULT_DIMS.length);
-    const h = clampDim(product.height, DEFAULT_DIMS.height, 4);
+    const dims = CATEGORY_DIMS[product.categoryId] ?? DEFAULT_DIMS;
+    const w = clampDim(product.width,  dims.width);
+    const l = clampDim(product.length, dims.length);
+    const h = clampDim(product.height, dims.height, 4);
     const newId = uid();
 
     setPlacedItems((prev) => {
       const occupied = prev.some(
-        (i) => Math.abs(i.position[0]) < 0.6 && Math.abs(i.position[2]) < 0.6
+        (i) => Math.abs(i.position[0]) < 0.8 && Math.abs(i.position[2]) < 0.8
       );
-      const offset = occupied ? (prev.length % 4) * 1.4 - 2 : 0;
-      const zOff = occupied ? Math.floor(prev.length / 4) * 1.4 : 0;
+      const offset = occupied ? (prev.length % 4) * 1.6 - 2.4 : 0;
+      const zOff   = occupied ? Math.floor(prev.length / 4) * 1.6 : 0;
       return [
         ...prev,
         {
@@ -139,7 +149,7 @@ export default function RoomBuilder() {
           length: l,
           height: h,
           categoryId: product.categoryId,
-          position: [offset, h / 2, zOff],
+          position: [offset, 0, zOff], // y=0: group sits at floor level
           rotationY: 0,
         },
       ];
