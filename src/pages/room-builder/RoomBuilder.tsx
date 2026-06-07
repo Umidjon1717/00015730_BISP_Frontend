@@ -2,18 +2,13 @@ import { useState, useEffect, useCallback } from "react";
 import { useDispatch } from "react-redux";
 import toast from "react-hot-toast";
 import { addCart } from "@/redux/features/cart-slice";
-import { resolveImageUrl } from "@/config/env";
+import { resolveImageUrl, getApiBaseUrl } from "@/config/env";
 import RoomScene, { PlacedItem, RBProduct, CATEGORY_COLORS } from "./RoomScene";
 
-const CATEGORY_NAMES: Record<number, string> = {
-  0: "All",
-  1: "Living Room",
-  2: "Bedroom",
-  3: "Dining",
-  4: "Office",
-  5: "Outdoor",
-  6: "Lighting",
-};
+interface RBCategory {
+  id: number;
+  name: string;
+}
 
 const ROOM_PRESETS = [
   { label: "4×4", w: 4, l: 4 },
@@ -47,6 +42,7 @@ function clampDim(v: unknown, def: number, max = 8): number {
 export default function RoomBuilder() {
   const dispatch = useDispatch();
   const [products, setProducts] = useState<RBProduct[]>([]);
+  const [categories, setCategories] = useState<RBCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [placedItems, setPlacedItems] = useState<PlacedItem[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -55,17 +51,34 @@ export default function RoomBuilder() {
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState(0);
 
-  // Fetch products from the furniture API
+  // Fetch real categories from backend
   useEffect(() => {
-    fetch("https://zero0015730-bisp-backend.onrender.com/api/products")
+    fetch(`${getApiBaseUrl()}category`)
       .then((r) => r.json())
       .then((data) => {
-        const arr: RBProduct[] = Array.isArray(data)
+        const arr: RBCategory[] = Array.isArray(data?.data?.category)
+          ? data.data.category
+          : Array.isArray(data?.data)
+          ? data.data
+          : Array.isArray(data)
           ? data
-          : Array.isArray(data?.data?.products)
+          : [];
+        setCategories(arr);
+      })
+      .catch(() => {});
+  }, []);
+
+  // Fetch all products with high limit so filters work across full catalog
+  useEffect(() => {
+    fetch(`${getApiBaseUrl()}products?limit=200`)
+      .then((r) => r.json())
+      .then((data) => {
+        const arr: RBProduct[] = Array.isArray(data?.data?.products)
           ? data.data.products
           : Array.isArray(data?.data)
           ? data.data
+          : Array.isArray(data)
+          ? data
           : [];
         setProducts(arr);
       })
@@ -201,19 +214,29 @@ export default function RoomBuilder() {
           />
         </div>
 
-        {/* Category tabs */}
+        {/* Category tabs — built from real API data */}
         <div className="flex flex-wrap gap-1.5 p-3 border-b border-gray-200 dark:border-zinc-700">
-          {Object.entries(CATEGORY_NAMES).map(([id, name]) => (
+          <button
+            onClick={() => setCategoryFilter(0)}
+            className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
+              categoryFilter === 0
+                ? "bg-bg-primary text-white"
+                : "bg-gray-100 dark:bg-zinc-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-600"
+            }`}
+          >
+            All
+          </button>
+          {categories.map((cat) => (
             <button
-              key={id}
-              onClick={() => setCategoryFilter(Number(id))}
+              key={cat.id}
+              onClick={() => setCategoryFilter(cat.id)}
               className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
-                categoryFilter === Number(id)
+                categoryFilter === cat.id
                   ? "bg-bg-primary text-white"
                   : "bg-gray-100 dark:bg-zinc-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-600"
               }`}
             >
-              {name}
+              {cat.name}
             </button>
           ))}
         </div>
