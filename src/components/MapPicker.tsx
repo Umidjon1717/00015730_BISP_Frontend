@@ -1,8 +1,6 @@
-import { useState, useEffect } from 'react'
-import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet'
-import * as L from 'leaflet'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import L from 'leaflet'
 
-// Fix Leaflet's broken default icon paths in Vite
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png'
 import markerIcon from 'leaflet/dist/images/marker-icon.png'
 import markerShadow from 'leaflet/dist/images/marker-shadow.png'
@@ -27,7 +25,6 @@ interface Props {
   onSelect: (loc: PickedLocation) => void
 }
 
-// Nominatim → REGIONS mapping
 const REGION_MAP: Record<string, string> = {
   toshkent: 'Tashkent', tashkent: 'Tashkent',
   namangan: 'Namangan',
@@ -36,7 +33,7 @@ const REGION_MAP: Record<string, string> = {
   jizzax: 'Jizzakh', jizzakh: 'Jizzakh',
   samarqand: 'Samarkand', samarkand: 'Samarkand',
   buxoro: 'Bukhara', bukhara: 'Bukhara',
-  qashqadaryo: 'Kashkadarya', kashkadarya: 'Kashkadarya', 'kashkadar\'ya': 'Kashkadarya',
+  qashqadaryo: 'Kashkadarya', kashkadarya: 'Kashkadarya', "kashkadar'ya": 'Kashkadarya',
   surxondaryo: 'Surkhandarya', surkhandarya: 'Surkhandarya',
   sirdaryo: 'Sirdarya', syrdarya: 'Sirdarya',
   navoiy: 'Navoi', navoi: 'Navoi',
@@ -50,25 +47,19 @@ function resolveRegion(state?: string): string {
   return REGION_MAP[key] ?? ''
 }
 
-// Fly map to new position
-function FlyTo({ pos }: { pos: [number, number] }) {
-  const map = useMap()
-  useEffect(() => { map.flyTo(pos, 15, { duration: 1 }) }, [pos, map])
-  return null
-}
-
-// Click handler inside map
-function ClickLayer({ onClick }: { onClick: (lat: number, lng: number) => void }) {
-  useMapEvents({ click: (e) => onClick(e.latlng.lat, e.latlng.lng) })
-  return null
-}
-
 export default function MapPicker({ onSelect }: Props) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const mapRef = useRef<L.Map | null>(null)
+  const markerRef = useRef<L.Marker | null>(null)
+  // Keep onSelect stable via ref so we never need to re-attach the click handler
+  const onSelectRef = useRef(onSelect)
+  useEffect(() => { onSelectRef.current = onSelect }, [onSelect])
+
   const [pin, setPin] = useState<[number, number] | null>(null)
   const [loading, setLoading] = useState(false)
   const [locating, setLocating] = useState(false)
 
-  const reverse = async (lat: number, lng: number) => {
+  const reverse = useCallback(async (lat: number, lng: number) => {
     setLoading(true)
     try {
       const res = await fetch(
@@ -77,32 +68,61 @@ export default function MapPicker({ onSelect }: Props) {
       )
       const data = await res.json()
       const a = data.address ?? {}
-      onSelect({
+      onSelectRef.current({
         lat, lng,
         street: a.road ?? a.street ?? a.pedestrian ?? a.path ?? '',
         district: a.suburb ?? a.quarter ?? a.neighbourhood ?? a.district ?? a.county ?? '',
         region: resolveRegion(a.state ?? a.province ?? a.region ?? ''),
       })
     } catch {
-      onSelect({ lat, lng, street: '', district: '', region: '' })
+      onSelectRef.current({ lat, lng, street: '', district: '', region: '' })
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
-  const handleClick = (lat: number, lng: number) => {
+  const placePin = useCallback((lat: number, lng: number) => {
+    const map = mapRef.current
+    if (!map) return
     setPin([lat, lng])
+    if (markerRef.current) {
+      markerRef.current.setLatLng([lat, lng])
+    } else {
+      markerRef.current = L.marker([lat, lng]).addTo(map)
+    }
+    map.flyTo([lat, lng], 15, { duration: 1 })
     reverse(lat, lng)
-  }
+  }, [reverse])
+
+  // Initialize Leaflet map once using vanilla API — no react-leaflet hooks
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el || mapRef.current) return
+
+    const map = L.map(el).setView([41.2995, 69.2401], 11)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    }).addTo(map)
+
+    map.on('click', (e: L.LeafletMouseEvent) => {
+      placePin(e.latlng.lat, e.latlng.lng)
+    })
+
+    mapRef.current = map
+
+    return () => {
+      map.remove()
+      mapRef.current = null
+      markerRef.current = null
+    }
+  }, [placePin])
 
   const handleMyLocation = () => {
     if (!navigator.geolocation) return
     setLocating(true)
     navigator.geolocation.getCurrentPosition(
       ({ coords }) => {
-        const pos: [number, number] = [coords.latitude, coords.longitude]
-        setPin(pos)
-        reverse(coords.latitude, coords.longitude)
+        placePin(coords.latitude, coords.longitude)
         setLocating(false)
       },
       () => setLocating(false),
@@ -112,26 +132,8 @@ export default function MapPicker({ onSelect }: Props) {
 
   return (
     <div className="relative rounded-xl overflow-hidden shadow-sm border border-gray-200 dark:border-zinc-600">
-      <MapContainer
-        center={[41.2995, 69.2401]}
-        zoom={11}
-        style={{ height: 280, width: '100%' }}
-        zoomControl={true}
-      >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        <ClickLayer onClick={handleClick} />
-        {pin && (
-          <>
-            <Marker position={pin} />
-            <FlyTo pos={pin} />
-          </>
-        )}
-      </MapContainer>
+      <div ref={containerRef} style={{ height: 280, width: '100%' }} />
 
-      {/* My location button */}
       <button
         type="button"
         onClick={handleMyLocation}
@@ -146,14 +148,12 @@ export default function MapPicker({ onSelect }: Props) {
         My Location
       </button>
 
-      {/* Geocoding spinner overlay */}
       {loading && (
         <div className="absolute inset-0 bg-white/40 dark:bg-black/30 flex items-center justify-center z-[999]">
-          <div className="w-7 h-7 border-3 border-black border-t-transparent rounded-full animate-spin" />
+          <div className="w-7 h-7 border-2 border-black border-t-transparent rounded-full animate-spin" />
         </div>
       )}
 
-      {/* Hint when no pin yet */}
       {!pin && !loading && (
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-[999] pointer-events-none">
           <span className="bg-white dark:bg-zinc-800 dark:text-white shadow-md rounded-full px-4 py-2 text-sm text-gray-600 font-medium">
