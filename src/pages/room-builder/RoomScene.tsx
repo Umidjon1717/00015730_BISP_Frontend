@@ -2,7 +2,7 @@
 import { useRef, useEffect, useState, useCallback } from "react";
 import { Canvas, useThree, useFrame } from "@react-three/fiber";
 import type { ThreeEvent } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Html } from "@react-three/drei";
+import { OrbitControls, ContactShadows, Environment, Html, RoundedBox } from "@react-three/drei";
 import * as THREE from "three";
 
 export type PlacedItem = {
@@ -65,66 +65,65 @@ interface ShapeProps {
 
 // ─── Sofa (Living Room) ───────────────────────────────────────────────────────
 function SofaShape({ w, h, l, color, isSelected }: ShapeProps) {
-  const legH = 0.1;
+  const legH = 0.13;
   const seatH = h * 0.42;
   const backH = h * 0.62;
-  const armW = Math.max(0.12, w * 0.1);
-  const wood = "#3D2010";
+  const armW = Math.max(0.14, w * 0.1);
+  const wood = "#2C1A0A";
+  const cushionXs = w > 1.6 ? [-w / 4, w / 4] : [0];
+  const cushionW = w > 1.6 ? w / 2 - 0.08 : w - armW * 2 - 0.06;
+  const armH = seatH * 0.6 + backH * 0.25;
+  const legPositions: [number, number][] = [
+    [-w / 2 + 0.15, l / 2 - 0.15],
+    [ w / 2 - 0.15, l / 2 - 0.15],
+    [-w / 2 + 0.15, -(l / 2 - 0.15)],
+    [ w / 2 - 0.15, -(l / 2 - 0.15)],
+  ];
   return (
     <group>
       {/* Seat base */}
       <mesh position={[0, legH + seatH * 0.28, 0]} castShadow receiveShadow>
         <boxGeometry args={[w, seatH * 0.55, l]} />
-        <meshStandardMaterial {...m(color, 0.92, 0, isSelected)} />
+        <meshStandardMaterial {...m(color, 0.9, 0, isSelected)} />
       </mesh>
-      {/* Seat cushions */}
-      {(w > 1.6 ? [-w / 4, w / 4] : [0]).map((x, i) => (
-        <mesh key={i} position={[x, legH + seatH * 0.72, 0]} castShadow receiveShadow>
-          <boxGeometry args={[w > 1.6 ? w / 2 - 0.06 : w - armW * 2 - 0.04, seatH * 0.5, l * 0.68]} />
+      {/* Seat cushions — rounded */}
+      {cushionXs.map((x, i) => (
+        <RoundedBox key={i} args={[cushionW, seatH * 0.52, l * 0.67]} radius={0.05} smoothness={4}
+          position={[x, legH + seatH * 0.76, 0]} castShadow receiveShadow>
           <meshStandardMaterial {...m(color, 0.95, 0, isSelected)} />
-        </mesh>
+        </RoundedBox>
       ))}
-      {/* Backrest */}
-      <mesh
-        position={[0, legH + seatH + backH * 0.5, -(l / 2 - 0.1)]}
-        castShadow receiveShadow
-      >
-        <boxGeometry args={[w, backH, 0.2]} />
-        <meshStandardMaterial {...m(color, 0.92, 0, isSelected)} />
+      {/* Backrest frame */}
+      <mesh position={[0, legH + seatH + backH * 0.5, -(l / 2 - 0.11)]} castShadow receiveShadow>
+        <boxGeometry args={[w, backH, 0.22]} />
+        <meshStandardMaterial {...m(color, 0.9, 0, isSelected)} />
       </mesh>
-      {/* Back cushions */}
-      {(w > 1.6 ? [-w / 4, w / 4] : [0]).map((x, i) => (
-        <mesh key={i} position={[x, legH + seatH + backH * 0.5, -(l / 2 - 0.22)]} castShadow receiveShadow>
-          <boxGeometry args={[w > 1.6 ? w / 2 - 0.08 : w - armW * 2 - 0.06, backH * 0.85, 0.12]} />
+      {/* Back cushions — rounded */}
+      {cushionXs.map((x, i) => (
+        <RoundedBox key={i} args={[cushionW, backH * 0.84, 0.15]} radius={0.04} smoothness={4}
+          position={[x, legH + seatH + backH * 0.5, -(l / 2 - 0.24)]} castShadow receiveShadow>
           <meshStandardMaterial {...m(color, 0.95, 0, isSelected)} />
-        </mesh>
+        </RoundedBox>
       ))}
-      {/* Left arm */}
-      <mesh
-        position={[-(w / 2 - armW / 2), legH + (seatH * 0.6 + backH * 0.25) / 2, 0]}
-        castShadow receiveShadow
-      >
-        <boxGeometry args={[armW, seatH * 0.6 + backH * 0.25, l]} />
-        <meshStandardMaterial {...m(color, 0.92, 0, isSelected)} />
-      </mesh>
-      {/* Right arm */}
-      <mesh
-        position={[(w / 2 - armW / 2), legH + (seatH * 0.6 + backH * 0.25) / 2, 0]}
-        castShadow receiveShadow
-      >
-        <boxGeometry args={[armW, seatH * 0.6 + backH * 0.25, l]} />
-        <meshStandardMaterial {...m(color, 0.92, 0, isSelected)} />
-      </mesh>
-      {/* Legs */}
-      {[
-        [-w / 2 + 0.13, l / 2 - 0.13],
-        [w / 2 - 0.13, l / 2 - 0.13],
-        [-w / 2 + 0.13, -(l / 2 - 0.13)],
-        [w / 2 - 0.13, -(l / 2 - 0.13)],
-      ].map(([x, z], i) => (
+      {/* Armrests */}
+      {([-1, 1] as const).map((side, i) => (
+        <group key={i}>
+          <mesh position={[side * (w / 2 - armW / 2), legH + armH / 2, 0]} castShadow receiveShadow>
+            <boxGeometry args={[armW, armH, l]} />
+            <meshStandardMaterial {...m(color, 0.9, 0, isSelected)} />
+          </mesh>
+          {/* Padded armrest top */}
+          <RoundedBox args={[armW + 0.02, 0.07, l + 0.02]} radius={0.03} smoothness={4}
+            position={[side * (w / 2 - armW / 2), legH + armH + 0.035, 0]} castShadow>
+            <meshStandardMaterial {...m(color, 0.88, 0, isSelected)} />
+          </RoundedBox>
+        </group>
+      ))}
+      {/* Cylindrical tapered legs */}
+      {legPositions.map(([x, z], i) => (
         <mesh key={i} position={[x, legH / 2, z]} castShadow>
-          <boxGeometry args={[0.07, legH, 0.07]} />
-          <meshStandardMaterial color={wood} roughness={0.5} metalness={0.1} />
+          <cylinderGeometry args={[0.032, 0.042, legH, 8]} />
+          <meshStandardMaterial color={wood} roughness={0.4} metalness={0.1} />
         </mesh>
       ))}
     </group>
@@ -133,44 +132,74 @@ function SofaShape({ w, h, l, color, isSelected }: ShapeProps) {
 
 // ─── Bed (Bedroom) ────────────────────────────────────────────────────────────
 function BedShape({ w, h, l, color, isSelected }: ShapeProps) {
+  const postR = 0.045;
+  const postH = Math.max(0.75, h * 1.15);
   const frameH = 0.18;
-  const mattH = h * 0.55;
-  const headH = Math.max(0.7, h * 1.1);
+  const mattH = h * 0.52;
   const wood = "#4A2C12";
+  const postXs = [-w / 2 + postR, w / 2 - postR] as const;
+  const postZs = [-l / 2 + postR, l / 2 - postR] as const;
+  const slats = 5;
   return (
     <group>
-      {/* Frame */}
+      {/* Bed frame */}
       <mesh position={[0, frameH / 2, 0]} castShadow receiveShadow>
         <boxGeometry args={[w, frameH, l]} />
-        <meshStandardMaterial color={wood} roughness={0.65} metalness={0} />
+        <meshStandardMaterial color={wood} roughness={0.65} />
       </mesh>
-      {/* Mattress */}
-      <mesh position={[0, frameH + mattH / 2, 0]} castShadow receiveShadow>
-        <boxGeometry args={[w * 0.94, mattH, l * 0.96]} />
-        <meshStandardMaterial {...m("#f2ede8", 0.88, 0, isSelected)} />
-      </mesh>
-      {/* Duvet */}
-      <mesh position={[0, frameH + mattH + 0.045, l * 0.18]} castShadow receiveShadow>
-        <boxGeometry args={[w * 0.89, 0.09, l * 0.58]} />
-        <meshStandardMaterial {...m(color, 0.95, 0, isSelected)} />
-      </mesh>
-      {/* Pillows */}
-      {[-(w * 0.22), w * 0.22].map((x, i) => (
-        <mesh key={i} position={[x, frameH + mattH + 0.07, -(l / 2 - 0.22)]} castShadow receiveShadow>
-          <boxGeometry args={[w * 0.37, 0.13, 0.35]} />
-          <meshStandardMaterial color="#f5f0ea" roughness={0.9} metalness={0} />
+      {/* Side rails */}
+      {([-1, 1] as const).map((side, i) => (
+        <mesh key={i} position={[side * (w / 2 - 0.04), frameH + 0.06, 0]} castShadow>
+          <boxGeometry args={[0.07, 0.12, l]} />
+          <meshStandardMaterial color={wood} roughness={0.65} />
         </mesh>
       ))}
-      {/* Headboard */}
-      <mesh position={[0, headH / 2, -(l / 2 - 0.05)]} castShadow receiveShadow>
-        <boxGeometry args={[w, headH, 0.1]} />
-        <meshStandardMaterial color={wood} roughness={0.65} metalness={0} />
+      {/* Mattress — rounded */}
+      <RoundedBox args={[w * 0.93, mattH, l * 0.95]} radius={0.04} smoothness={4}
+        position={[0, frameH + mattH / 2, 0]} castShadow receiveShadow>
+        <meshStandardMaterial color="#f2ede8" roughness={0.88} />
+      </RoundedBox>
+      {/* Duvet — rounded */}
+      <RoundedBox args={[w * 0.88, 0.1, l * 0.56]} radius={0.04} smoothness={4}
+        position={[0, frameH + mattH + 0.05, l * 0.17]} castShadow receiveShadow>
+        <meshStandardMaterial {...m(color, 0.95, 0, isSelected)} />
+      </RoundedBox>
+      {/* Pillows — rounded */}
+      {[-(w * 0.21), w * 0.21].map((x, i) => (
+        <RoundedBox key={i} args={[w * 0.36, 0.12, 0.34]} radius={0.04} smoothness={4}
+          position={[x, frameH + mattH + 0.06, -(l / 2 - 0.23)]} castShadow receiveShadow>
+          <meshStandardMaterial color="#f5f0ea" roughness={0.9} />
+        </RoundedBox>
+      ))}
+      {/* Headboard — vertical slats */}
+      {Array.from({ length: slats }).map((_, i) => {
+        const x = -w / 2 + ((i + 0.5) * w) / slats;
+        return (
+          <mesh key={i} position={[x, postH * 0.52, -(l / 2 - 0.06)]} castShadow receiveShadow>
+            <boxGeometry args={[w / slats - 0.03, postH * 0.78, 0.07]} />
+            <meshStandardMaterial color={wood} roughness={0.6} />
+          </mesh>
+        );
+      })}
+      {/* Headboard rail */}
+      <mesh position={[0, postH * 0.06, -(l / 2 - 0.06)]} castShadow>
+        <boxGeometry args={[w, postH * 0.12, 0.09]} />
+        <meshStandardMaterial color={wood} roughness={0.6} />
       </mesh>
       {/* Footboard */}
-      <mesh position={[0, frameH + mattH * 0.3, l / 2 - 0.05]} castShadow receiveShadow>
-        <boxGeometry args={[w, frameH + mattH * 0.3, 0.07]} />
-        <meshStandardMaterial color={wood} roughness={0.65} metalness={0} />
+      <mesh position={[0, frameH + mattH * 0.28, l / 2 - 0.05]} castShadow receiveShadow>
+        <boxGeometry args={[w, frameH + mattH * 0.28, 0.08]} />
+        <meshStandardMaterial color={wood} roughness={0.65} />
       </mesh>
+      {/* Cylindrical corner bedposts */}
+      {postXs.flatMap((x) =>
+        postZs.map((z, j) => (
+          <mesh key={`${x}-${j}`} position={[x, postH / 2, z]} castShadow>
+            <cylinderGeometry args={[postR, postR * 1.1, postH, 10]} />
+            <meshStandardMaterial color={wood} roughness={0.5} metalness={0.05} />
+          </mesh>
+        ))
+      )}
     </group>
   );
 }
@@ -179,36 +208,37 @@ function BedShape({ w, h, l, color, isSelected }: ShapeProps) {
 function TableShape({ w, h, l, color, isSelected }: ShapeProps) {
   const topH = 0.07;
   const legH = h - topH;
-  const legS = 0.07;
+  const legR = 0.04;
+  const legPositions: [number, number][] = [
+    [-w / 2 + 0.1, l / 2 - 0.1],
+    [ w / 2 - 0.1, l / 2 - 0.1],
+    [-w / 2 + 0.1, -(l / 2 - 0.1)],
+    [ w / 2 - 0.1, -(l / 2 - 0.1)],
+  ];
   return (
     <group>
-      {/* Table top */}
-      <mesh position={[0, legH + topH / 2, 0]} castShadow receiveShadow>
-        <boxGeometry args={[w, topH, l]} />
-        <meshStandardMaterial {...m(color, 0.65, 0, isSelected)} />
-      </mesh>
-      {/* Apron (underside frame) */}
+      {/* Table top — rounded */}
+      <RoundedBox args={[w, topH, l]} radius={0.025} smoothness={4}
+        position={[0, legH + topH / 2, 0]} castShadow receiveShadow>
+        <meshStandardMaterial {...m(color, 0.6, 0.05, isSelected)} />
+      </RoundedBox>
+      {/* Apron frame */}
       {([
-        [0, 0, l / 2 - 0.04, w * 0.9, 0.06, 0.04],
-        [0, 0, -(l / 2 - 0.04), w * 0.9, 0.06, 0.04],
-        [w / 2 - 0.04, 0, 0, 0.04, 0.06, l * 0.9],
-        [-(w / 2 - 0.04), 0, 0, 0.04, 0.06, l * 0.9],
-      ] as [number, number, number, number, number, number][]).map(([x, , z, bw, bh, bl], i) => (
+        [0,          l / 2 - 0.04,  w * 0.9, 0.06, 0.04],
+        [0,         -(l / 2 - 0.04), w * 0.9, 0.06, 0.04],
+        [ w / 2 - 0.04, 0,           0.04,   0.06, l * 0.9],
+        [-(w / 2 - 0.04), 0,         0.04,   0.06, l * 0.9],
+      ] as [number, number, number, number, number][]).map(([x, z, bw, bh, bl], i) => (
         <mesh key={i} position={[x, legH - 0.04, z]} castShadow>
           <boxGeometry args={[bw, bh, bl]} />
           <meshStandardMaterial {...m(color, 0.65, 0, isSelected)} />
         </mesh>
       ))}
-      {/* Legs */}
-      {[
-        [-w / 2 + 0.1, l / 2 - 0.1],
-        [w / 2 - 0.1, l / 2 - 0.1],
-        [-w / 2 + 0.1, -(l / 2 - 0.1)],
-        [w / 2 - 0.1, -(l / 2 - 0.1)],
-      ].map(([x, z], i) => (
+      {/* Cylindrical tapered legs */}
+      {legPositions.map(([x, z], i) => (
         <mesh key={i} position={[x, legH / 2, z]} castShadow receiveShadow>
-          <boxGeometry args={[legS, legH, legS]} />
-          <meshStandardMaterial {...m(color, 0.65, 0, isSelected)} />
+          <cylinderGeometry args={[legR * 0.8, legR, legH, 8]} />
+          <meshStandardMaterial {...m(color, 0.6, 0.05, isSelected)} />
         </mesh>
       ))}
     </group>
@@ -219,75 +249,89 @@ function TableShape({ w, h, l, color, isSelected }: ShapeProps) {
 function DeskShape({ w, h, l, color, isSelected }: ShapeProps) {
   const topH = 0.05;
   const legH = h - topH;
-  const legS = 0.05;
-  const metalMat = { color: "#999999", roughness: 0.3, metalness: 0.85, emissive: "#ffffff", emissiveIntensity: isSelected ? 0.05 : 0 };
+  const legR = 0.022;
+  const metalMat = { color: "#8a8a8a", roughness: 0.25, metalness: 0.9, emissive: "#ffffff" as string, emissiveIntensity: isSelected ? 0.05 : 0 };
+  const legPositions: [number, number][] = [
+    [-w / 2 + 0.07, l / 2 - 0.07],
+    [ w / 2 - 0.07, l / 2 - 0.07],
+    [-w / 2 + 0.07, -(l / 2 - 0.07)],
+    [ w / 2 - 0.07, -(l / 2 - 0.07)],
+  ];
   return (
     <group>
-      {/* Desk top */}
-      <mesh position={[0, legH + topH / 2, 0]} castShadow receiveShadow>
-        <boxGeometry args={[w, topH, l]} />
-        <meshStandardMaterial {...m(color, 0.62, 0.05, isSelected)} />
-      </mesh>
-      {/* Metal legs */}
-      {[
-        [-w / 2 + 0.06, l / 2 - 0.06],
-        [w / 2 - 0.06, l / 2 - 0.06],
-        [-w / 2 + 0.06, -(l / 2 - 0.06)],
-        [w / 2 - 0.06, -(l / 2 - 0.06)],
-      ].map(([x, z], i) => (
+      {/* Desk top — rounded */}
+      <RoundedBox args={[w, topH, l]} radius={0.02} smoothness={4}
+        position={[0, legH + topH / 2, 0]} castShadow receiveShadow>
+        <meshStandardMaterial {...m(color, 0.55, 0.06, isSelected)} />
+      </RoundedBox>
+      {/* Thin metal tube legs */}
+      {legPositions.map(([x, z], i) => (
         <mesh key={i} position={[x, legH / 2, z]} castShadow receiveShadow>
-          <boxGeometry args={[legS, legH, legS]} />
+          <cylinderGeometry args={[legR, legR, legH, 8]} />
           <meshStandardMaterial {...metalMat} />
         </mesh>
       ))}
-      {/* Monitor */}
-      <mesh position={[0, legH + topH + 0.32, -(l / 2 - 0.09)]} castShadow>
-        <boxGeometry args={[Math.min(0.55, w * 0.4), 0.38, 0.04]} />
-        <meshStandardMaterial color="#111111" roughness={0.2} metalness={0.7} />
+      {/* Cross stretcher between front legs */}
+      <mesh position={[0, legH * 0.18, l / 2 - 0.07]} rotation={[0, 0, Math.PI / 2]} castShadow>
+        <cylinderGeometry args={[legR * 0.8, legR * 0.8, w - 0.14, 8]} />
+        <meshStandardMaterial {...metalMat} />
       </mesh>
-      <mesh position={[0, legH + topH + 0.13, -(l / 2 - 0.11)]} castShadow>
-        <boxGeometry args={[0.05, 0.22, 0.05]} />
+      {/* Monitor */}
+      <RoundedBox args={[Math.min(0.54, w * 0.4), 0.36, 0.04]} radius={0.015} smoothness={4}
+        position={[0, legH + topH + 0.31, -(l / 2 - 0.1)]} castShadow>
+        <meshStandardMaterial color="#111111" roughness={0.15} metalness={0.75} />
+      </RoundedBox>
+      {/* Monitor stand */}
+      <mesh position={[0, legH + topH + 0.12, -(l / 2 - 0.12)]} castShadow>
+        <cylinderGeometry args={[0.018, 0.018, 0.24, 8]} />
         <meshStandardMaterial color="#333333" roughness={0.3} metalness={0.8} />
       </mesh>
-      {/* Keyboard */}
-      <mesh position={[0, legH + topH + 0.015, 0]} castShadow>
-        <boxGeometry args={[Math.min(0.38, w * 0.27), 0.02, 0.12]} />
-        <meshStandardMaterial color="#dddddd" roughness={0.7} metalness={0.1} />
+      {/* Monitor base disc */}
+      <mesh position={[0, legH + topH + 0.01, -(l / 2 - 0.12)]} castShadow>
+        <cylinderGeometry args={[0.1, 0.11, 0.02, 12]} />
+        <meshStandardMaterial color="#222222" roughness={0.4} metalness={0.7} />
       </mesh>
+      {/* Keyboard */}
+      <RoundedBox args={[Math.min(0.36, w * 0.26), 0.02, 0.115]} radius={0.008} smoothness={3}
+        position={[0, legH + topH + 0.012, 0]} castShadow>
+        <meshStandardMaterial color="#d8d8d8" roughness={0.7} metalness={0.1} />
+      </RoundedBox>
     </group>
   );
 }
 
 // ─── Outdoor Bench ────────────────────────────────────────────────────────────
 function BenchShape({ w, h, l, color, isSelected }: ShapeProps) {
-  const seatH = 0.07;
-  const seatY = h - seatH;
-  const metalMat = { color: "#666666", roughness: 0.45, metalness: 0.75, emissive: "#ffffff", emissiveIntensity: isSelected ? 0.05 : 0 };
-  const slats = 4;
-  const slatW = (l / slats) * 0.78;
+  const seatY = h - 0.07;
+  const legR = 0.025;
+  const metalMat = { color: "#606060", roughness: 0.35, metalness: 0.8, emissive: "#ffffff" as string, emissiveIntensity: isSelected ? 0.05 : 0 };
+  const slats = 5;
+  const slatGap = l / slats;
   return (
     <group>
-      {/* Seat slats */}
+      {/* Rounded seat slats */}
       {Array.from({ length: slats }).map((_, i) => {
-        const z = -l / 2 + (i + 0.5) * (l / slats);
+        const z = -l / 2 + (i + 0.5) * slatGap;
         return (
-          <mesh key={i} position={[0, seatY + seatH / 2, z]} castShadow receiveShadow>
-            <boxGeometry args={[w, seatH, slatW]} />
-            <meshStandardMaterial {...m(color, 0.7, 0, isSelected)} />
-          </mesh>
+          <RoundedBox key={i} args={[w, 0.055, slatGap * 0.8]} radius={0.02} smoothness={4}
+            position={[0, seatY + 0.028, z]} castShadow receiveShadow>
+            <meshStandardMaterial {...m(color, 0.65, 0, isSelected)} />
+          </RoundedBox>
         );
       })}
-      {/* Side frames */}
-      {[-w / 2 + 0.07, w / 2 - 0.07].map((x, i) => (
+      {/* Side frames — cylindrical legs */}
+      {([-w / 2 + 0.06, w / 2 - 0.06] as const).map((x, i) => (
         <group key={i} position={[x, 0, 0]}>
-          {[l / 2 - 0.07, -(l / 2 - 0.07)].map((z, j) => (
+          {/* Front & back vertical legs */}
+          {([l / 2 - 0.08, -(l / 2 - 0.08)] as const).map((z, j) => (
             <mesh key={j} position={[0, seatY / 2, z]} castShadow>
-              <boxGeometry args={[0.06, seatY, 0.06]} />
+              <cylinderGeometry args={[legR, legR, seatY, 8]} />
               <meshStandardMaterial {...metalMat} />
             </mesh>
           ))}
-          <mesh position={[0, seatY * 0.38, 0]} castShadow>
-            <boxGeometry args={[0.06, 0.06, l * 0.82]} />
+          {/* Horizontal stretcher */}
+          <mesh position={[0, seatY * 0.3, 0]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+            <cylinderGeometry args={[legR * 0.85, legR * 0.85, l * 0.84, 8]} />
             <meshStandardMaterial {...metalMat} />
           </mesh>
         </group>
@@ -298,30 +342,36 @@ function BenchShape({ w, h, l, color, isSelected }: ShapeProps) {
 
 // ─── Floor Lamp (Lighting) ────────────────────────────────────────────────────
 function LampShape({ w, h, color, isSelected }: Omit<ShapeProps, "l">) {
-  const poleH = h * 0.8;
-  const shadeH = h * 0.18;
-  const shadeW = Math.max(0.38, w * 0.9);
+  const poleH = h * 0.82;
+  const shadeH = h * 0.2;
+  const shadeR = Math.max(0.22, w * 0.55);
+  const poleMat = { color: "#b0b0b0", roughness: 0.2, metalness: 0.95, emissive: "#ffffff" as string, emissiveIntensity: isSelected ? 0.05 : 0 };
   return (
     <group>
-      {/* Base */}
-      <mesh position={[0, 0.04, 0]} castShadow receiveShadow>
-        <boxGeometry args={[0.28, 0.07, 0.28]} />
-        <meshStandardMaterial color="#888888" roughness={0.4} metalness={0.8} emissive="#ffffff" emissiveIntensity={isSelected ? 0.06 : 0} />
+      {/* Weighted disc base */}
+      <mesh position={[0, 0.025, 0]} castShadow receiveShadow>
+        <cylinderGeometry args={[0.18, 0.2, 0.05, 16]} />
+        <meshStandardMaterial color="#888888" roughness={0.35} metalness={0.85} emissive="#ffffff" emissiveIntensity={isSelected ? 0.06 : 0} />
       </mesh>
-      {/* Pole */}
-      <mesh position={[0, 0.04 + poleH / 2, 0]} castShadow>
-        <boxGeometry args={[0.04, poleH, 0.04]} />
-        <meshStandardMaterial color="#aaaaaa" roughness={0.3} metalness={0.9} emissive="#ffffff" emissiveIntensity={isSelected ? 0.05 : 0} />
+      {/* Thin cylindrical pole */}
+      <mesh position={[0, 0.05 + poleH / 2, 0]} castShadow>
+        <cylinderGeometry args={[0.018, 0.022, poleH, 10]} />
+        <meshStandardMaterial {...poleMat} />
       </mesh>
-      {/* Shade */}
-      <mesh position={[0, 0.04 + poleH + shadeH / 2, 0]} castShadow receiveShadow>
-        <boxGeometry args={[shadeW, shadeH, shadeW]} />
-        <meshStandardMaterial {...m(color, 0.75, 0, isSelected)} />
+      {/* Cone shade — open bottom */}
+      <mesh position={[0, 0.05 + poleH + shadeH * 0.45, 0]} castShadow receiveShadow>
+        <coneGeometry args={[shadeR, shadeH, 20, 1, true]} />
+        <meshStandardMaterial {...m(color, 0.72, 0, isSelected)} side={THREE.DoubleSide} />
+      </mesh>
+      {/* Shade top cap ring */}
+      <mesh position={[0, 0.05 + poleH + shadeH * 0.9, 0]} castShadow>
+        <cylinderGeometry args={[0.04, 0.04, 0.03, 10]} />
+        <meshStandardMaterial {...poleMat} />
       </mesh>
       {/* Bulb glow */}
-      <mesh position={[0, 0.04 + poleH, 0]}>
-        <sphereGeometry args={[0.06, 8, 8]} />
-        <meshStandardMaterial color="#fff8e0" emissive="#fff5cc" emissiveIntensity={1.2} roughness={1} />
+      <mesh position={[0, 0.05 + poleH + 0.06, 0]}>
+        <sphereGeometry args={[0.055, 12, 12]} />
+        <meshStandardMaterial color="#fff9e6" emissive="#ffe066" emissiveIntensity={1.5} roughness={1} />
       </mesh>
     </group>
   );
