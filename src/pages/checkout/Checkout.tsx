@@ -3,12 +3,11 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useCheckTokenQuery } from "@/redux/api/customer-api";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "@/redux";
 import { useCreateOrderMutation } from "@/redux/api/order-api";
 import { useEffect } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
-import { clearCart } from "@/redux/features/cart-slice";
 // import { useGetAddressQuery } from "@/redux/api/order-address-api";
 
 const schema = yup
@@ -33,7 +32,6 @@ interface CheckoutFormData {
 }
 
 const Checkout = () => {
-  const dispatch = useDispatch();
   const { data } = useCheckTokenQuery(null);
   const cart = useSelector((state: RootState) => state.cart.value);
   const token = useSelector((state: RootState) => state.token.access_token);
@@ -82,11 +80,8 @@ const Checkout = () => {
       .unwrap()
       .then((res: any) => {
         const orderId = res?.data?.id ?? res?.data?.order?.id
+        reset();
         navigate(`/checkout/payment?orderId=${orderId}&amount=${total_price}`)
-        setTimeout(() => {
-          dispatch(clearCart());
-          reset();
-        }, 250);
       })
       .catch((e) => console.log(e));
   };

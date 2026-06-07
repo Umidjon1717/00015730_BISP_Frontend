@@ -1,11 +1,19 @@
+import { useEffect } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { clearCart } from '@/redux/features/cart-slice'
 
 export default function SuccessPage() {
   const [params] = useSearchParams()
   const navigate = useNavigate()
+  const dispatch = useDispatch()
   const orderId = params.get('orderId')
   const method = params.get('method')
   const amount = params.get('amount')
+
+  useEffect(() => {
+    dispatch(clearCart())
+  }, [])
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
