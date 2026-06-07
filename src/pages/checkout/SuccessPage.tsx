@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { clearCart } from '@/redux/features/cart-slice'
+import { sendOrderNotification } from '@/utils/telegram'
 
 export default function SuccessPage() {
   const [params] = useSearchParams()
@@ -13,6 +14,7 @@ export default function SuccessPage() {
 
   useEffect(() => {
     dispatch(clearCart())
+    sendOrderNotification(orderId, amount, method)
   }, [])
 
   return (

@@ -6,8 +6,10 @@ import {
 } from "@/redux/api/order-api";
 import { resolveImageUrl } from "@/config/env";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const Order = () => {
+  const navigate = useNavigate();
   const { data } = useCheckTokenQuery(null);
   const [cancellingOrderId, setCancellingOrderId] = React.useState<number | null>(
     null
@@ -108,17 +110,31 @@ const Order = () => {
                 hour12: false,
               })}
             </p>
-            {isOrderCancellable(order.status) && (
-              <button
-                onClick={() => handleCancelOrder(order?.id)}
-                disabled={cancelLoading && order?.id === cancellingOrderId}
-                className="text-white absolute max-sm:top-0 top-7 hover:bg-opacity-85 right-0 rounded-md py-1 px-4 font-semibold text-lg bg-red-400 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {cancelLoading && order?.id === cancellingOrderId
-                  ? "Cancelling..."
-                  : "Cancel Order"}
-              </button>
-            )}
+            <div className="absolute max-sm:top-0 top-7 right-0 flex gap-2">
+              {order.status === "PENDING" && (
+                <button
+                  onClick={() =>
+                    navigate(
+                      `/checkout/payment?orderId=${order.id}&amount=${order.total_price}`
+                    )
+                  }
+                  className="text-white rounded-md py-1 px-4 font-semibold text-lg bg-black hover:bg-opacity-80"
+                >
+                  Proceed to Payment
+                </button>
+              )}
+              {isOrderCancellable(order.status) && (
+                <button
+                  onClick={() => handleCancelOrder(order?.id)}
+                  disabled={cancelLoading && order?.id === cancellingOrderId}
+                  className="text-white rounded-md py-1 px-4 font-semibold text-lg bg-red-400 disabled:cursor-not-allowed disabled:opacity-60 hover:bg-opacity-85"
+                >
+                  {cancelLoading && order?.id === cancellingOrderId
+                    ? "Cancelling..."
+                    : "Cancel Order"}
+                </button>
+              )}
+            </div>
           </div>
 
           <p className="text-gray-700 dark:text-gray-300 mt-4">

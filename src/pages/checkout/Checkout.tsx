@@ -6,7 +6,7 @@ import { useCheckTokenQuery } from "@/redux/api/customer-api";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux";
 import { useCreateOrderMutation } from "@/redux/api/order-api";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 // import { useGetAddressQuery } from "@/redux/api/order-address-api";
 
@@ -32,6 +32,7 @@ interface CheckoutFormData {
 }
 
 const Checkout = () => {
+  const [submitted, setSubmitted] = useState(false);
   const { data } = useCheckTokenQuery(null);
   const cart = useSelector((state: RootState) => state.cart.value);
   const token = useSelector((state: RootState) => state.token.access_token);
@@ -81,13 +82,14 @@ const Checkout = () => {
       .then((res: any) => {
         const orderId = res?.data?.result?.order?.id
         const amount = res?.data?.result?.order?.total_price ?? total_price
+        setSubmitted(true);
         reset();
         navigate(`/checkout/payment?orderId=${orderId}&amount=${amount}`)
       })
       .catch((e) => console.log(e));
   };
 
-  if (!token || cart.length === 0) {
+  if (!submitted && (!token || cart.length === 0)) {
     return <Navigate replace to="/cart" />;
   }
 
