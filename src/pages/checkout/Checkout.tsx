@@ -80,8 +80,9 @@ const Checkout = () => {
 
     createOrder(order)
       .unwrap()
-      .then(() => {
-        navigate("/auth/profile/order");
+      .then((res: any) => {
+        const orderId = res?.data?.id ?? res?.data?.order?.id
+        navigate(`/checkout/payment?orderId=${orderId}&amount=${total_price}`)
         setTimeout(() => {
           dispatch(clearCart());
           reset();

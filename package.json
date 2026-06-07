@@ -20,6 +20,8 @@
     "@react-three/drei": "^9.122.0",
     "@react-three/fiber": "^8.18.0",
     "@reduxjs/toolkit": "^2.5.0",
+    "@stripe/react-stripe-js": "^6.6.0",
+    "@stripe/stripe-js": "^9.7.0",
     "@types/styled-components": "^5.1.34",
     "lucide-react": "^0.474.0",
     "otp-timer-ts": "^3.1.0",

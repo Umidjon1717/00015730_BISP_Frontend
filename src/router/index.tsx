@@ -33,6 +33,8 @@ const ResetPassword = lazy(
   () => import("@/pages/auth/reset-password/ResetPassword")
 );
 const Checkout = lazy(() => import("@/pages/checkout/Checkout"));
+const PaymentPage = lazy(() => import("@/pages/checkout/PaymentPage"));
+const SuccessPage = lazy(() => import("@/pages/checkout/SuccessPage"));
 const AiSearch = lazy(() => import("@/pages/ai-search/AiSearch"));
 const RoomStyle = lazy(() => import("@/pages/room-style/RoomStyle"));
 const RoomBuilder = lazy(() => import("@/pages/room-builder/RoomBuilder"));
@@ -134,6 +136,22 @@ const Routers = () => {
               element: (
                 <SuspenseContainer>
                   <Checkout />
+                </SuspenseContainer>
+              ),
+            },
+            {
+              path: "/checkout/payment",
+              element: (
+                <SuspenseContainer>
+                  <PaymentPage />
+                </SuspenseContainer>
+              ),
+            },
+            {
+              path: "/checkout/success",
+              element: (
+                <SuspenseContainer>
+                  <SuccessPage />
                 </SuspenseContainer>
               ),
             },
