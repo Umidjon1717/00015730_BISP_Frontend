@@ -14,4 +14,12 @@ export default defineConfig({
       "@": root,
     } as AliasOptions,
   },
+  optimizeDeps: {
+    include: ['leaflet'],
+  },
+  build: {
+    commonjsOptions: {
+      include: [/leaflet/, /node_modules/],
+    },
+  },
 });

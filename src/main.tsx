@@ -1,5 +1,6 @@
 import App from "./App.tsx";
 import "./sass/index.scss";
+import 'leaflet/dist/leaflet.css';
 import { BrowserRouter } from "react-router-dom";
 import { store } from "./redux";
 import { Provider } from "react-redux";

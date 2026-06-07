@@ -6,9 +6,11 @@ import { useCheckTokenQuery } from "@/redux/api/customer-api";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux";
 import { useCreateOrderMutation } from "@/redux/api/order-api";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, lazy, Suspense } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
-import MapPicker, { PickedLocation } from "@/components/MapPicker";
+
+const MapPicker = lazy(() => import("@/components/MapPicker"));
+type PickedLocation = { lat: number; lng: number; street: string; district: string; region: string };
 // import { useGetAddressQuery } from "@/redux/api/order-address-api";
 
 const schema = yup
@@ -121,7 +123,9 @@ const Checkout = () => {
 
       {/* Map picker */}
       <div className="mb-6">
-        <MapPicker onSelect={handleLocationPick} />
+        <Suspense fallback={<div className="h-[280px] rounded-xl bg-gray-100 dark:bg-zinc-700 animate-pulse" />}>
+          <MapPicker onSelect={handleLocationPick} />
+        </Suspense>
         {pickedLocation && (
           <p className="text-xs text-green-600 dark:text-green-400 mt-2 text-center">
             📍 Location saved ({pickedLocation.lat.toFixed(5)}, {pickedLocation.lng.toFixed(5)})
