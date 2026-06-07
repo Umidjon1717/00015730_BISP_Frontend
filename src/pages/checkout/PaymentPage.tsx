@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Elements } from '@stripe/react-stripe-js'
 import { stripePromise } from '@/lib/stripe'
 import StripeCheckoutForm from '@/components/StripeCheckoutForm'
+import { getApiBaseUrl } from '@/config/env'
 
 export default function PaymentPage() {
   const navigate = useNavigate()
@@ -22,7 +23,7 @@ export default function PaymentPage() {
 
   useEffect(() => {
     if (tab !== 'card' || clientSecret) return
-    fetch(`${import.meta.env.VITE_BASE_URL}payment/stripe/create-intent`, {
+    fetch(`${getApiBaseUrl()}payment/stripe/create-intent`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ orderId, amount }),
@@ -39,7 +40,7 @@ export default function PaymentPage() {
     setCodLoading(true)
     setError(null)
     try {
-      const res = await fetch(`${import.meta.env.VITE_BASE_URL}payment/cod`, {
+      const res = await fetch(`${getApiBaseUrl()}payment/cod`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ orderId, amount }),

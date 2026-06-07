@@ -79,7 +79,12 @@ const Checkout = () => {
     createOrder(order)
       .unwrap()
       .then((res: any) => {
-        const orderId = res?.data?.id ?? res?.data?.order?.id
+        console.log('[createOrder response]', JSON.stringify(res))
+        const orderId =
+          res?.data?.id ??
+          res?.data?.order?.id ??
+          res?.id ??
+          res?.order?.id
         reset();
         navigate(`/checkout/payment?orderId=${orderId}&amount=${total_price}`)
       })

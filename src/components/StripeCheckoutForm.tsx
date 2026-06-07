@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
+import { getApiBaseUrl } from '@/config/env'
 
 interface Props {
   orderId: number
@@ -31,7 +32,7 @@ export default function StripeCheckoutForm({ orderId, paymentIntentId, onSuccess
       return
     }
 
-    await fetch(`${import.meta.env.VITE_BASE_URL}payment/stripe/confirm`, {
+    await fetch(`${getApiBaseUrl()}payment/stripe/confirm`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ orderId, paymentIntentId }),
