@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Hide Stripe Link badge injected globally by Stripe.js */
+iframe[name="stripe-badge-frame"],
+#stripe-badge-frame {
+  display: none !important;
+}
+
 @import "swiper/css";
 @import "swiper/css/free-mode";
 @import "swiper/css/autoplay";

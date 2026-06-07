@@ -45,7 +45,7 @@ export default function StripeCheckoutForm({ orderId, paymentIntentId, onSuccess
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <PaymentElement />
+      <PaymentElement options={{ wallets: { googlePay: 'never', applePay: 'never' } }} />
       {error && <p className="text-red-500 text-sm">{error}</p>}
       <button
         type="submit"

@@ -85,7 +85,7 @@ export default function PaymentPage() {
         {tab === 'card' && (
           <>
             {clientSecret ? (
-              <Elements stripe={stripePromise} options={{ clientSecret }}>
+              <Elements stripe={stripePromise} options={{ clientSecret, loader: 'auto' }}>
                 <StripeCheckoutForm
                   orderId={orderId}
                   paymentIntentId={paymentIntentId!}
