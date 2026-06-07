@@ -6,8 +6,9 @@ import { useCheckTokenQuery } from "@/redux/api/customer-api";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux";
 import { useCreateOrderMutation } from "@/redux/api/order-api";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
+import MapPicker, { PickedLocation } from "@/components/MapPicker";
 // import { useGetAddressQuery } from "@/redux/api/order-address-api";
 
 const schema = yup
@@ -33,6 +34,8 @@ interface CheckoutFormData {
 
 const Checkout = () => {
   const [submitted, setSubmitted] = useState(false);
+  const [pickedLocation, setPickedLocation] = useState<PickedLocation | null>(null);
+  const formRef = useRef<HTMLDivElement>(null);
   const { data } = useCheckTokenQuery(null);
   const cart = useSelector((state: RootState) => state.cart.value);
   const token = useSelector((state: RootState) => state.token.access_token);
@@ -49,6 +52,7 @@ const Checkout = () => {
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
     setFocus,
   } = useForm({
@@ -62,6 +66,16 @@ const Checkout = () => {
     },
   });
 
+  const handleLocationPick = (loc: PickedLocation) => {
+    setPickedLocation(loc);
+    if (loc.street)   setValue('street', loc.street, { shouldValidate: true });
+    if (loc.district) setValue('district', loc.district, { shouldValidate: true });
+    if (loc.region && REGIONS.includes(loc.region))
+      setValue('region', loc.region, { shouldValidate: true });
+    // scroll form into view after pin drop
+    setTimeout(() => formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 400);
+  };
+
   const onSubmit: SubmitHandler<CheckoutFormData> = (address) => {
     const total_price = cart?.reduce(
       (sum, product) => sum + product.price * product.amount,
@@ -69,7 +83,12 @@ const Checkout = () => {
     );
     const order = {
       customerId: data?.customer?.id,
-      address,
+      address: {
+        ...address,
+        ...(pickedLocation
+          ? { latitude: pickedLocation.lat, longitude: pickedLocation.lng }
+          : {}),
+      },
       order_details: cart?.map((product) => ({
         productId: product.id,
         quantity: product.amount,
@@ -95,7 +114,31 @@ const Checkout = () => {
 
   return (
     <div className="container max-w-2xl mx-auto mt-10 p-4 dark:bg-gray-800 dark:text-white rounded-lg">
-      <h2 className="text-3xl font-semibold mb-6 text-center">Checkout</h2>
+      <h2 className="text-3xl font-semibold mb-2 text-center">Checkout</h2>
+      <p className="text-center text-gray-500 dark:text-gray-400 text-sm mb-6">
+        Pin your delivery location on the map, then confirm the details below.
+      </p>
+
+      {/* Map picker */}
+      <div className="mb-6">
+        <MapPicker onSelect={handleLocationPick} />
+        {pickedLocation && (
+          <p className="text-xs text-green-600 dark:text-green-400 mt-2 text-center">
+            📍 Location saved ({pickedLocation.lat.toFixed(5)}, {pickedLocation.lng.toFixed(5)})
+          </p>
+        )}
+      </div>
+
+      {/* Divider */}
+      <div className="flex items-center gap-3 mb-6">
+        <div className="flex-1 h-px bg-gray-200 dark:bg-zinc-600" />
+        <span className="text-xs text-gray-400 font-medium whitespace-nowrap">
+          Confirm delivery details
+        </span>
+        <div className="flex-1 h-px bg-gray-200 dark:bg-zinc-600" />
+      </div>
+
+      <div ref={formRef}>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div>
           <select
@@ -186,6 +229,7 @@ const Checkout = () => {
           Order
         </button>
       </form>
+      </div>
     </div>
   );
 };
