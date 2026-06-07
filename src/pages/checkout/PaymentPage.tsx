@@ -5,6 +5,8 @@ import { stripePromise } from '@/lib/stripe'
 import StripeCheckoutForm from '@/components/StripeCheckoutForm'
 import { getApiBaseUrl } from '@/config/env'
 
+const apiBase = () => getApiBaseUrl().replace(/\/+$/, '')
+
 export default function PaymentPage() {
   const navigate = useNavigate()
   const [params] = useSearchParams()
@@ -23,7 +25,7 @@ export default function PaymentPage() {
 
   useEffect(() => {
     if (tab !== 'card' || clientSecret) return
-    fetch(`${getApiBaseUrl()}payment/stripe/create-intent`, {
+    fetch(`${apiBase()}/payment/stripe/create-intent`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ orderId, amount }),
@@ -40,7 +42,7 @@ export default function PaymentPage() {
     setCodLoading(true)
     setError(null)
     try {
-      const res = await fetch(`${getApiBaseUrl()}payment/cod`, {
+      const res = await fetch(`${apiBase()}/payment/cod`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ orderId, amount }),
