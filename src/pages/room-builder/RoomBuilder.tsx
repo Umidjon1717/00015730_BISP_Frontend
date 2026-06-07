@@ -15,10 +15,10 @@ const CATEGORY_NAMES: Record<number, string> = {
   6: "Lighting",
 };
 
-const ROOM_SIZES = [
-  { label: "Small 4×4m", size: 4 },
-  { label: "Medium 6×6m", size: 6 },
-  { label: "Large 8×8m", size: 8 },
+const ROOM_PRESETS = [
+  { label: "4×4", w: 4, l: 4 },
+  { label: "6×6", w: 6, l: 6 },
+  { label: "8×8", w: 8, l: 8 },
 ];
 
 // Realistic default dimensions per category (meters) — used when API has no dims
@@ -50,7 +50,8 @@ export default function RoomBuilder() {
   const [loading, setLoading] = useState(true);
   const [placedItems, setPlacedItems] = useState<PlacedItem[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [roomSize, setRoomSize] = useState(6);
+  const [roomW, setRoomW] = useState(6);
+  const [roomL, setRoomL] = useState(6);
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState(0);
 
@@ -249,23 +250,54 @@ export default function RoomBuilder() {
       {/* ── Canvas area ── */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top bar: room size + item count */}
-        <div className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-zinc-800 border-b border-gray-200 dark:border-zinc-700 shrink-0">
-          <span className="text-sm text-gray-600 dark:text-gray-400 font-medium mr-1">
-            Room:
+        <div className="flex flex-wrap items-center gap-2 px-4 py-2 bg-white dark:bg-zinc-800 border-b border-gray-200 dark:border-zinc-700 shrink-0">
+          <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">
+            Room size:
           </span>
-          {ROOM_SIZES.map(({ label, size }) => (
+          {ROOM_PRESETS.map(({ label, w, l }) => (
             <button
-              key={size}
-              onClick={() => setRoomSize(size)}
+              key={label}
+              onClick={() => { setRoomW(w); setRoomL(l); }}
               className={`px-3 py-1 rounded-lg text-xs font-semibold transition-colors ${
-                roomSize === size
+                roomW === w && roomL === l
                   ? "bg-bg-primary text-white"
                   : "bg-gray-100 dark:bg-zinc-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-600"
               }`}
             >
-              {label}
+              {label}m
             </button>
           ))}
+
+          {/* Custom W × L inputs */}
+          <div className="flex items-center gap-1 ml-1">
+            <input
+              type="number"
+              min={2}
+              max={20}
+              value={roomW}
+              onChange={(e) => {
+                const v = Math.min(20, Math.max(2, Number(e.target.value)));
+                if (v) setRoomW(v);
+              }}
+              className="w-14 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-900 dark:text-white rounded-md px-2 py-1 text-xs text-center focus:outline-none focus:border-bg-primary"
+              title="Room width (m)"
+            />
+            <span className="text-gray-400 text-xs font-bold">×</span>
+            <input
+              type="number"
+              min={2}
+              max={20}
+              value={roomL}
+              onChange={(e) => {
+                const v = Math.min(20, Math.max(2, Number(e.target.value)));
+                if (v) setRoomL(v);
+              }}
+              className="w-14 border border-gray-300 dark:border-zinc-600 dark:bg-zinc-900 dark:text-white rounded-md px-2 py-1 text-xs text-center focus:outline-none focus:border-bg-primary"
+              title="Room length (m)"
+            />
+            <span className="text-xs text-gray-400">m</span>
+          </div>
+
           <span className="ml-auto text-sm text-gray-500 dark:text-gray-400">
             {placedItems.length} item
             {placedItems.length !== 1 ? "s" : ""} in room
@@ -288,7 +320,8 @@ export default function RoomBuilder() {
           <RoomScene
             placedItems={placedItems}
             selectedId={selectedId}
-            roomSize={roomSize}
+            roomW={roomW}
+            roomL={roomL}
             products={products}
             onSelectItem={setSelectedId}
             onDeselectAll={() => setSelectedId(null)}

@@ -347,51 +347,52 @@ const CATEGORY_SHAPES: Record<number, React.ComponentType<ShapeProps>> = {
 };
 
 // ─── Room ─────────────────────────────────────────────────────────────────────
-function Room({ size }: { size: number }) {
-  const half = size / 2;
+function Room({ w, l }: { w: number; l: number }) {
+  const halfW = w / 2;
+  const halfL = l / 2;
   const wallH = 3.2;
   return (
     <group>
       {/* Hardwood floor */}
       <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[size, size]} />
+        <planeGeometry args={[w, l]} />
         <meshStandardMaterial color="#c4956a" roughness={0.82} metalness={0.02} />
       </mesh>
-      {/* Floor boards lines (very subtle via secondary layer) */}
+      {/* Subtle floor board lines */}
       <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.001, 0]}>
-        <planeGeometry args={[size, size, 1, Math.floor(size * 3)]} />
-        <meshStandardMaterial color="#ba8a60" roughness={0.9} wireframe={false} opacity={0.18} transparent />
+        <planeGeometry args={[w, l, 1, Math.floor(l * 3)]} />
+        <meshStandardMaterial color="#ba8a60" roughness={0.9} opacity={0.18} transparent />
       </mesh>
 
       {/* Back wall */}
-      <mesh position={[0, wallH / 2, -half]} receiveShadow>
-        <planeGeometry args={[size, wallH]} />
+      <mesh position={[0, wallH / 2, -halfL]} receiveShadow>
+        <planeGeometry args={[w, wallH]} />
         <meshStandardMaterial color="#f2ede6" roughness={0.95} />
       </mesh>
       {/* Left wall */}
-      <mesh position={[-half, wallH / 2, 0]} rotation={[0, Math.PI / 2, 0]} receiveShadow>
-        <planeGeometry args={[size, wallH]} />
+      <mesh position={[-halfW, wallH / 2, 0]} rotation={[0, Math.PI / 2, 0]} receiveShadow>
+        <planeGeometry args={[l, wallH]} />
         <meshStandardMaterial color="#ede9e2" roughness={0.95} />
       </mesh>
       {/* Right wall */}
-      <mesh position={[half, wallH / 2, 0]} rotation={[0, -Math.PI / 2, 0]} receiveShadow>
-        <planeGeometry args={[size, wallH]} />
+      <mesh position={[halfW, wallH / 2, 0]} rotation={[0, -Math.PI / 2, 0]} receiveShadow>
+        <planeGeometry args={[l, wallH]} />
         <meshStandardMaterial color="#ede9e2" roughness={0.95} />
       </mesh>
 
       {/* Baseboard back */}
-      <mesh position={[0, 0.06, -half + 0.01]} castShadow>
-        <boxGeometry args={[size, 0.12, 0.02]} />
+      <mesh position={[0, 0.06, -halfL + 0.01]} castShadow>
+        <boxGeometry args={[w, 0.12, 0.02]} />
         <meshStandardMaterial color="#e8e2da" roughness={0.9} />
       </mesh>
       {/* Baseboard left */}
-      <mesh position={[-half + 0.01, 0.06, 0]} rotation={[0, Math.PI / 2, 0]} castShadow>
-        <boxGeometry args={[size, 0.12, 0.02]} />
+      <mesh position={[-halfW + 0.01, 0.06, 0]} rotation={[0, Math.PI / 2, 0]} castShadow>
+        <boxGeometry args={[l, 0.12, 0.02]} />
         <meshStandardMaterial color="#e8e2da" roughness={0.9} />
       </mesh>
       {/* Baseboard right */}
-      <mesh position={[half - 0.01, 0.06, 0]} rotation={[0, Math.PI / 2, 0]} castShadow>
-        <boxGeometry args={[size, 0.12, 0.02]} />
+      <mesh position={[halfW - 0.01, 0.06, 0]} rotation={[0, Math.PI / 2, 0]} castShadow>
+        <boxGeometry args={[l, 0.12, 0.02]} />
         <meshStandardMaterial color="#e8e2da" roughness={0.9} />
       </mesh>
     </group>
@@ -406,7 +407,8 @@ interface FurnitureMeshProps {
   onUpdatePosition: (id: string, pos: [number, number, number]) => void;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   orbitControlsRef: React.RefObject<any>;
-  roomHalfSize: number;
+  roomHalfW: number;
+  roomHalfL: number;
 }
 
 function FurnitureMesh({
@@ -415,7 +417,8 @@ function FurnitureMesh({
   onSelect,
   onUpdatePosition,
   orbitControlsRef,
-  roomHalfSize,
+  roomHalfW,
+  roomHalfL,
 }: FurnitureMeshProps) {
   const groupRef = useRef<THREE.Group>(null);
   const { camera, gl } = useThree();
@@ -444,7 +447,6 @@ function FurnitureMesh({
 
   useEffect(() => {
     const canvas = gl.domElement;
-    const half = roomHalfSize;
     const hw = (item.width || 1) / 2;
     const hl = (item.length || 1) / 2;
 
@@ -459,9 +461,9 @@ function FurnitureMesh({
       const result = rc.current.ray.intersectPlane(floorPlane.current, hit.current);
       if (result) {
         posRef.current = [
-          Math.max(-half + hw, Math.min(half - hw, hit.current.x)),
+          Math.max(-roomHalfW + hw, Math.min(roomHalfW - hw, hit.current.x)),
           0,
-          Math.max(-half + hl, Math.min(half - hl, hit.current.z)),
+          Math.max(-roomHalfL + hl, Math.min(roomHalfL - hl, hit.current.z)),
         ];
       }
     };
@@ -479,7 +481,7 @@ function FurnitureMesh({
       canvas.removeEventListener("pointermove", onMove);
       canvas.removeEventListener("pointerup", onUp);
     };
-  }, [gl.domElement, camera, item.id, item.width, item.length, roomHalfSize, onUpdatePosition, orbitControlsRef]);
+  }, [gl.domElement, camera, item.id, item.width, item.length, roomHalfW, roomHalfL, onUpdatePosition, orbitControlsRef]);
 
   const handlePointerDown = useCallback(
     (e: ThreeEvent<PointerEvent>) => {
@@ -554,14 +556,16 @@ function FurnitureMesh({
 interface SceneProps {
   placedItems: PlacedItem[];
   selectedId: string | null;
-  roomSize: number;
+  roomW: number;
+  roomL: number;
   onSelectItem: (id: string) => void;
   onUpdatePosition: (id: string, pos: [number, number, number]) => void;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   orbitControlsRef: React.RefObject<any>;
 }
 
-function Scene({ placedItems, selectedId, roomSize, onSelectItem, onUpdatePosition, orbitControlsRef }: SceneProps) {
+function Scene({ placedItems, selectedId, roomW, roomL, onSelectItem, onUpdatePosition, orbitControlsRef }: SceneProps) {
+  const maxDim = Math.max(roomW, roomL);
   return (
     <>
       <ambientLight intensity={0.35} />
@@ -586,13 +590,13 @@ function Scene({ placedItems, selectedId, roomSize, onSelectItem, onUpdatePositi
       <ContactShadows
         position={[0, 0.01, 0]}
         opacity={0.45}
-        scale={roomSize * 1.5}
+        scale={maxDim * 1.5}
         blur={2.2}
-        far={roomSize}
+        far={maxDim}
         resolution={512}
       />
 
-      <Room size={roomSize} />
+      <Room w={roomW} l={roomL} />
 
       {placedItems.map((item) => (
         <FurnitureMesh
@@ -602,7 +606,8 @@ function Scene({ placedItems, selectedId, roomSize, onSelectItem, onUpdatePositi
           onSelect={onSelectItem}
           onUpdatePosition={onUpdatePosition}
           orbitControlsRef={orbitControlsRef}
-          roomHalfSize={roomSize / 2}
+          roomHalfW={roomW / 2}
+          roomHalfL={roomL / 2}
         />
       ))}
 
@@ -625,7 +630,8 @@ function Scene({ placedItems, selectedId, roomSize, onSelectItem, onUpdatePositi
 export interface RoomSceneProps {
   placedItems: PlacedItem[];
   selectedId: string | null;
-  roomSize: number;
+  roomW: number;
+  roomL: number;
   products: RBProduct[];
   onSelectItem: (id: string) => void;
   onDeselectAll: () => void;
@@ -638,7 +644,8 @@ export interface RoomSceneProps {
 export default function RoomScene({
   placedItems,
   selectedId,
-  roomSize,
+  roomW,
+  roomL,
   products,
   onSelectItem,
   onDeselectAll,
@@ -654,18 +661,21 @@ export default function RoomScene({
     ? products.find((p) => p.id === selectedItem.productId) ?? null
     : null;
 
+  const camDist = Math.max(roomW, roomL) * 1.2 + 3;
+
   return (
     <div style={{ width: "100%", height: "100%", position: "relative" }}>
       <Canvas
         shadows
-        camera={{ position: [0, 7, 9], fov: 45 }}
+        camera={{ position: [0, camDist * 0.8, camDist], fov: 45 }}
         style={{ background: "#e8e4de" }}
         onPointerMissed={onDeselectAll}
       >
         <Scene
           placedItems={placedItems}
           selectedId={selectedId}
-          roomSize={roomSize}
+          roomW={roomW}
+          roomL={roomL}
           onSelectItem={onSelectItem}
           onUpdatePosition={onUpdatePosition}
           orbitControlsRef={orbitControlsRef}
