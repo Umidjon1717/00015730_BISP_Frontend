@@ -55,7 +55,7 @@ function m(
   };
 }
 
-interface ShapeProps {
+export interface ShapeProps {
   w: number;
   h: number;
   l: number;
@@ -387,7 +387,8 @@ function DefaultShape({ w, h, l, color, isSelected }: ShapeProps) {
   );
 }
 
-const CATEGORY_SHAPES: Record<number, React.ComponentType<ShapeProps>> = {
+// eslint-disable-next-line react-refresh/only-export-components
+export const CATEGORY_SHAPES: Record<number, React.ComponentType<ShapeProps>> = {
   1: SofaShape,
   2: BedShape,
   3: TableShape,
