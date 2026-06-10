@@ -1,6 +1,4 @@
-import { ReactNode, useEffect, useState, lazy, Suspense } from "react";
-
-const ProductViewer3D = lazy(() => import("@/components/ProductViewer3D"));
+import { ReactNode, useEffect, useState } from "react";
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
 import "./Detail.scss";
 import { FaFacebook } from "react-icons/fa";
@@ -25,7 +23,6 @@ const ProductDetail = ({
   id: number;
 }) => {
   const [selectedImage, setSelectedImage] = useState(0);
-  const [viewMode, setViewMode] = useState<"photos" | "3d">("photos");
   const cart = useSelector((state: RootState) => state.cart.value);
   const [activeTab, setActiveTab] = useState("description");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -110,75 +107,41 @@ const ProductDetail = ({
     <>
       <div id="product__detail" className="container mx-auto my-10 ">
         <div className="grid grid-cols-2 gap-8 max-[990px]:grid-cols-1 pb-10">
-          {/* Photos / 3D toggle */}
-          <div className="flex gap-2 mb-3">
-            <button
-              onClick={() => setViewMode("photos")}
-              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium transition-colors border ${
-                viewMode === "photos"
-                  ? "bg-gray-900 dark:bg-white text-white dark:text-gray-900 border-gray-900 dark:border-white"
-                  : "bg-transparent text-gray-500 border-gray-300 dark:border-zinc-600 hover:border-gray-400"
-              }`}
-            >
-              📸 Photos
-            </button>
-            <button
-              onClick={() => setViewMode("3d")}
-              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium transition-colors border ${
-                viewMode === "3d"
-                  ? "bg-gray-900 dark:bg-white text-white dark:text-gray-900 border-gray-900 dark:border-white"
-                  : "bg-transparent text-gray-500 border-gray-300 dark:border-zinc-600 hover:border-gray-400"
-              }`}
-            >
-              ✦ 3D View
-            </button>
-          </div>
+          <div className="flex">
+            <div className="product__detail flex flex-col space-y-4 mr-4 overflow-y-auto h-80 no-scrollbar">
+              {product?.images.map((img, index) => (
+                <img
+                  key={index}
+                  src={resolveImageUrl(img)}
+                  alt={`Thumbnail ${index + 1}`}
+                  className="
+                  w-full max-w-[160px] h-auto aspect-video object-cover
+                  sm:max-w-[120px]
+                  md:max-w-[140px]
+                  lg:max-w-[180px]
+                  xl:max-w-[200px]
+                  rounded cursor-pointer border-2 border-gray-200 hover:border-blue-500"
+                  onClick={() => setSelectedImage(index)}
+                />
+              ))}
+            </div>
 
-          {viewMode === "photos" ? (
-            <div className="flex">
-              <div className="product__detail flex flex-col space-y-4 mr-4 overflow-y-auto h-80 no-scrollbar">
-                {product?.images.map((img, index) => (
-                  <img
-                    key={index}
-                    src={resolveImageUrl(img)}
-                    alt={`Thumbnail ${index + 1}`}
-                    className="
-                    w-full max-w-[160px] h-auto aspect-video object-cover
-                    sm:max-w-[120px]
-                    md:max-w-[140px]
-                    lg:max-w-[180px]
-                    xl:max-w-[200px]
-                    rounded cursor-pointer border-2 border-gray-200 hover:border-blue-500"
-                    onClick={() => setSelectedImage(index)}
-                  />
-                ))}
-              </div>
-              <div>
-                <div className="w-full max-w-lg h-80 overflow-hidden">
-                  <img
-                    src={resolveImageUrl(product.images?.[selectedImage])}
-                    alt={product.name}
-                    className="w-full h-full object-cover rounded-lg"
-                    onClick={() => {
-                      setModalImage(resolveImageUrl(product.images?.[selectedImage]));
-                      setIsModalOpen(true);
-                    }}
-                  />
-                </div>
+            <div>
+              <div className="w-full max-w-lg h-80 overflow-hidden">
+                <img
+                  src={resolveImageUrl(product.images?.[selectedImage])}
+                  alt={product.name}
+                  className="w-full h-full object-cover rounded-lg"
+                  onClick={() => {
+                    setModalImage(
+                      resolveImageUrl(product.images?.[selectedImage])
+                    );
+                    setIsModalOpen(true);
+                  }}
+                />
               </div>
             </div>
-          ) : (
-            <Suspense
-              fallback={
-                <div className="w-full rounded-2xl bg-gray-100 dark:bg-zinc-700 animate-pulse" style={{ height: 380 }} />
-              }
-            >
-              <ProductViewer3D
-                categoryId={product.categoryId ?? 1}
-                colors={product.colors}
-              />
-            </Suspense>
-          )}
+          </div>
           {isModalOpen && (
             <Modal
               imageUrl={modalImage}
